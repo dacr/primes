@@ -1,17 +1,7 @@
 /*
  * Copyright 2013 David Crosson
  * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Licensed under the GPL, Version 2.0
  */
 
 package primes
@@ -22,12 +12,13 @@ object Primes {
   
   type PInteger = BigInt
 
-  def pow(n:PInteger, p:PInteger) = {
+  def pow(n:PInteger, p:PInteger):PInteger = {
     @tailrec
-    def powit(cur:PInteger, p:PInteger):PInteger = {
-      if (p==1) cur else powit(cur*n, p-1) 
+    def powit(cur:PInteger, r:PInteger):PInteger = {
+      if (r==1) cur else powit(cur*n, r-1) 
     }
-    powit(n,p)
+    if (p<0) sys.error("Not supported")
+    if (p==0) 1 else powit(n,p)
   }
   
   def isPrime(v: PInteger): Boolean = {

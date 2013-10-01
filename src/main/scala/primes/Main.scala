@@ -1,3 +1,8 @@
+/*
+ * Copyright 2013 David Crosson
+ * 
+ * Licensed under the GPL, Version 2.0
+ */
 package primes
 
 import java.awt._
