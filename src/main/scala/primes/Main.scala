@@ -46,7 +46,7 @@ object Main {
   // -------------------------------------------------------------
   def ulamSpiralToPng(size:Int) {
     val bi = ulamSpiral(size)
-    ImageIO.write(bi, "PNG", new File(s"primes-${size}.png"));    
+    ImageIO.write(bi, "PNG", new File(s"ulam-spiral-${size}.png"));    
   }
   
   

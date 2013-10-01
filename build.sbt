@@ -18,7 +18,10 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "1.9.+" % "test"
 
 libraryDependencies += "junit" % "junit" % "4.+" % "test"
 
-initialCommands in console := """import primes._"""
+initialCommands in console := """
+import primes._
+import Primes._
+"""
 
 sourceGenerators in Compile <+= 
  (sourceManaged in Compile, version, name, jarName in assembly) map {

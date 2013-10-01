@@ -82,4 +82,12 @@ object Primes {
     candidatesStream
       .filter(isSexyPrime(_))
     
+  def twinPrimeStream =
+    candidatesStream
+      .filter(isTwinPrime(_))
+      
+  def isolatedPrimeStream =
+    candidatesStream
+      .filter(isIsolatedPrime(_))
+
 }
