@@ -59,10 +59,9 @@ object Primes {
 
   def primeStreamPar =
     candidatesStream
-      .grouped(1000)
+      .grouped(10000)
       .toStream
-      .map(_.par)
-      .flatMap(_.filter(isPrime(_)))
+      .flatMap(_.par.filter(isPrime(_)))  // TODO : Memory impact of the .par is too huge... 
 
   def mersennePrimeStream=
     candidatesStream

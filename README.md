@@ -14,8 +14,8 @@ To starts the console and play with primes :
 
 $ sbt console"
 
-scala> sexyPrimeStream(4)
-res3: primes.Primes.PInteger = 17
+scala> primeStream(500)
+res1: primes.Primes.PInteger = 3581
 
 scala> primeStream.take(15).toList
 res3: List[primes.Primes.PInteger] = List(2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47)
