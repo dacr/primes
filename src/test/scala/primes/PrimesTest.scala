@@ -33,7 +33,7 @@ class PrimesTest extends FunSuite with ShouldMatchers {
     primeStream.drop(999).head should equal(7919)
   }
   
-  val perfTestSeries=List(25000, 50000, 75000, 100000)
+  val perfTestSeries=List(25000, 50000, 75000, 100000, 125000)
   
   test("Performance classic tests") {
     for (sz <- perfTestSeries) 
