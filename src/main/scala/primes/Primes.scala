@@ -10,7 +10,9 @@ object Primes {
 
   import annotation.tailrec
 
-  type PInteger = BigInt
+  type PInteger = Long
+  //type PInteger = BigInt
+  
 
   def pow(n: PInteger, p: PInteger): PInteger = {
     @tailrec
@@ -25,10 +27,10 @@ object Primes {
   // https://issues.scala-lang.org/browse/SI-3739
   // (http://www.codecodex.com/wiki/Calculate_an_integer_square_root)
   //
-  def sqrt(number: BigInt) = {
-    def next(n: BigInt, i: BigInt): BigInt = (n + i / n) >> 1
+  def sqrt(number: PInteger) = {
+    def next(n: PInteger, i: PInteger): PInteger = (n + i / n) >> 1
 
-    val one = BigInt(1)
+    val one:PInteger = 1
 
     var n = one
     var n1 = next(n, number)
