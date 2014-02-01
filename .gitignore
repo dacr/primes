@@ -9,4 +9,5 @@ target/
 .cache
 .settings
 images/
+*.png
 

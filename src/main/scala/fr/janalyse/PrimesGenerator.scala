@@ -4,23 +4,32 @@
  * Licensed under the GPL, Version 2.0
  */
 
-package primes
+package fr.janalyse.primes
 
-object Primes {
+case class CheckedValue(
+  value: Long,
+  isPrime: Boolean,
+  digitCount: Long,
+  nth: Long)
+
+  
+class PrimesGenerator[PInteger](implicit numops: Integral[PInteger]) {
 
   import annotation.tailrec
+  import numops._
 
-  type PInteger = Long
-  //type PInteger = BigInt
-  
+  val two = one + one
+  val three = one + one + one
+  val four = two + two
+  val six = three + three
 
   def pow(n: PInteger, p: PInteger): PInteger = {
     @tailrec
     def powit(cur: PInteger, r: PInteger): PInteger = {
-      if (r == 1) cur else powit(cur * n, r - 1)
+      if (r == 1) cur else powit(cur * n, r - one)
     }
-    if (p < 0) sys.error("Not supported")
-    if (p == 0) 1 else powit(n, p)
+    if (p < zero) sys.error("Not supported")
+    if (p == 0) one else powit(n, p)
   }
 
   // This sqrt method on integers comes from
@@ -28,9 +37,8 @@ object Primes {
   // (http://www.codecodex.com/wiki/Calculate_an_integer_square_root)
   //
   def sqrt(number: PInteger) = {
-    def next(n: PInteger, i: PInteger): PInteger = (n + i / n) >> 1
-
-    val one:PInteger = 1
+    //def next(n: PInteger, i: PInteger): PInteger = (n + i / n) >> 1
+    def next(n: PInteger, i: PInteger): PInteger = (n + i / n) / two
 
     var n = one
     var n1 = next(n, number)
@@ -46,45 +54,34 @@ object Primes {
 
     n1
   }
-/*
+
   def isPrime(v: PInteger): Boolean = {
-    @tailrec
-    def checkUpTo(curr: PInteger, upTo: PInteger): Boolean =
-      if (curr >= upTo) true
-      else (v /% curr) match {
-        case (_, mod) if mod == 0 => false
-        case (nextUpTo, _)        => checkUpTo(curr + 1, nextUpTo + 1)
-      }
-    checkUpTo(2, v/2+1)
-  }
-*/
-  def isPrime(v: PInteger): Boolean = {
-    val upTo=sqrt(v)
+    val upTo = sqrt(v)
     @tailrec
     def checkUpTo(from: PInteger): Boolean = {
       if (v % from == 0) false
-      else if (from == upTo ) true else checkUpTo(from + 1)
+      else if (from == upTo) true else checkUpTo(from + one)
     }
-    (v <= 3) || checkUpTo(2)
+    (v <= three) || checkUpTo(two)
   }
 
   def isMersennePrimeExponent(v: PInteger): Boolean =
-    isPrime(v) && isPrime(pow(2, v) - 1)
+    isPrime(v) && isPrime(pow(two, v) - one)
 
   def isSexyPrime(v: PInteger): Boolean =
-    isPrime(v) && isPrime(v + 6)
+    isPrime(v) && isPrime(v + six)
 
   def isTwinPrime(v: PInteger): Boolean =
-    isPrime(v) && isPrime(v + 2)
+    isPrime(v) && isPrime(v + two)
 
   def isIsolatedPrime(v: PInteger): Boolean =
-    !isPrime(v - 2) && isPrime(v) && !isPrime(v + 2)
+    !isPrime(v - two) && isPrime(v) && !isPrime(v + two)
 
   // ------------------------ STREAMS ------------------------
 
   def integerStream = {
-    def next(cur: PInteger): Stream[PInteger] = cur #:: next(cur + 1)
-    next(1)
+    def next(cur: PInteger): Stream[PInteger] = cur #:: next(cur + one)
+    next(one)
   }
 
   def candidatesStream = integerStream.tail
@@ -103,7 +100,7 @@ object Primes {
 
   def mersennePrimeStream =
     candidatesStream
-      .map(pow(2, _))
+      .map(pow(two, _))
       .filter(isPrime(_))
 
   def sexyPrimeStream =

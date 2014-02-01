@@ -4,13 +4,17 @@ seq(assemblySettings: _*)
 
 name := "primes"
 
-version := "v2014-01-31"
+version := "1.0.0"
+
+organization :="fr.janalyse"
+
+organizationHomepage := Some(new URL("http://www.janalyse.fr"))
 
 scalaVersion := "2.10.3"
 
 scalacOptions ++= Seq("-unchecked", "-deprecation" )
 
-mainClass in assembly := Some("primes.Main")
+mainClass in assembly := Some("fr.janalyse.primes.Main")
 
 jarName in assembly := "primes.jar"
 
@@ -19,8 +23,7 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "2.0" % "test"
 libraryDependencies += "junit" % "junit" % "4.+" % "test"
 
 initialCommands in console := """
-import primes._
-import Primes._
+import fr.janalyse.primes._
 """
 
 sourceGenerators in Compile <+= 
@@ -37,3 +40,11 @@ sourceGenerators in Compile <+=
     |""".stripMargin.format(version, projectname, jarexe.split("[.]").head) )
   Seq(file)
 }
+
+publishTo := Some(
+     Resolver.sftp(
+         "JAnalyse Repository",
+         "www.janalyse.fr",
+         "/home/tomcat/webapps-janalyse/repository"
+     ) as("tomcat", new File(util.Properties.userHome+"/.ssh/id_rsa"))
+)
