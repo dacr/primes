@@ -4,7 +4,7 @@ seq(assemblySettings: _*)
 
 name := "primes"
 
-version := "v2013-09-29"
+version := "v2014-01-31"
 
 scalaVersion := "2.10.3"
 
@@ -14,7 +14,7 @@ mainClass in assembly := Some("primes.Main")
 
 jarName in assembly := "primes.jar"
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "1.9.+" % "test"
+libraryDependencies += "org.scalatest" %% "scalatest" % "2.0" % "test"
 
 libraryDependencies += "junit" % "junit" % "4.+" % "test"
 
