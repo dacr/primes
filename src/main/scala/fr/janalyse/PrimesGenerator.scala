@@ -6,13 +6,6 @@
 
 package fr.janalyse.primes
 
-case class CheckedValue(
-  value: Long,
-  isPrime: Boolean,
-  digitCount: Long,
-  nth: Long)
-
-  
 class PrimesGenerator[PInteger](implicit numops: Integral[PInteger]) {
 
   import annotation.tailrec
