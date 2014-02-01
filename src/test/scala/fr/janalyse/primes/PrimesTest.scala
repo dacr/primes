@@ -38,7 +38,17 @@ class PrimesTest extends FunSuite with ShouldMatchers {
     primes.drop(999).head should equal(7919)
   }
 
-  val perfTestSeries = List(25000, 50000, 75000, 100000)
+  test("checked values tests") {
+    val pgen=new PrimesGenerator[Long]
+    import pgen._
+    val values=checkedValues.take(1000)
+    val prime100=values.filter(_.isPrime).drop(99)
+    val notPrime100=values.filter(!_.isPrime).drop(99)
+    prime100.head.value should equal(541)
+    notPrime100.head.value should equal(133)
+  }
+  
+  val perfTestSeries = List(25000, 50000, 75000)
 
   test("Performance classic tests - Long") {
     val pgen = new PrimesGenerator[Long]

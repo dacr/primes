@@ -6,6 +6,18 @@
 
 package fr.janalyse.primes
 
+case class CheckedValue[NUM](
+  value: NUM,
+  isPrime: Boolean,
+  nth: NUM)(implicit numops: Integral[NUM])
+
+object CheckedValue {
+  def first[NUM](implicit numops: Integral[NUM]): CheckedValue[NUM] = {
+    import numops._
+    CheckedValue(one + one, true, one)
+  }
+}
+
 class PrimesGenerator[NUM](implicit numops: Integral[NUM]) {
 
   import annotation.tailrec
@@ -25,12 +37,7 @@ class PrimesGenerator[NUM](implicit numops: Integral[NUM]) {
     if (p == 0) one else powit(n, p)
   }
 
-  // This sqrt method on integers comes from
-  // https://issues.scala-lang.org/browse/SI-3739
-  // (http://www.codecodex.com/wiki/Calculate_an_integer_square_root)
-  //
-  private def sqrt(number: NUM) = {
-    //def next(n: PInteger, i: PInteger): PInteger = (n + i / n) >> 1
+  private def sqrt(number: NUM) = { //https://issues.scala-lang.org/browse/SI-3739
     def next(n: NUM, i: NUM): NUM = (n + i / n) / two
 
     var n = one
@@ -75,6 +82,19 @@ class PrimesGenerator[NUM](implicit numops: Integral[NUM]) {
   def integers = {
     def next(cur: NUM): Stream[NUM] = cur #:: next(cur + one)
     next(one)
+  }
+
+  def checkedValues = {
+    def next(cur: CheckedValue[NUM], nextPrimeNth: NUM, nextNotPrimeNth: NUM): Stream[CheckedValue[NUM]] = cur #:: {
+      val nextvalue = cur.value + one
+      val isPrimeResult = isPrime(nextvalue)
+      val nth = if (isPrimeResult) nextPrimeNth else nextNotPrimeNth
+      next(
+        CheckedValue[NUM](nextvalue, isPrimeResult, nth),
+        if (isPrimeResult) nextPrimeNth + one else nextPrimeNth,
+        if (isPrimeResult) nextNotPrimeNth else nextNotPrimeNth + one)
+    }
+    next(CheckedValue.first[NUM], two, one)
   }
 
   def candidates = integers.tail
