@@ -116,15 +116,15 @@ class PrimesGenerator[NUM](implicit numops: Integral[NUM]) {
       .map(pow(two, _))
       .filter(isPrime(_))
 
-  def sexyPrimeStream =
+  def sexyPrimes =
     candidates
       .filter(isSexyPrime(_))
 
-  def twinPrimeStream =
+  def twinPrimes =
     candidates
       .filter(isTwinPrime(_))
 
-  def isolatedPrimeStream =
+  def isolatedPrimes =
     candidates
       .filter(isIsolatedPrime(_))
 
