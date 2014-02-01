@@ -9,12 +9,13 @@ package fr.janalyse.primes
 case class CheckedValue[NUM](
   value: NUM,
   isPrime: Boolean,
+  digitCount:Long,
   nth: NUM)(implicit numops: Integral[NUM])
 
 object CheckedValue {
   def first[NUM](implicit numops: Integral[NUM]): CheckedValue[NUM] = {
     import numops._
-    CheckedValue(one + one, true, one)
+    CheckedValue(one + one, true, 1, one)
   }
 }
 
@@ -93,7 +94,7 @@ class PrimesGenerator[NUM](implicit numops: Integral[NUM]) {
       val isPrimeResult = isPrime(nextvalue)
       val nth = if (isPrimeResult) nextPrimeNth else nextNotPrimeNth
       checkedValues(
-        CheckedValue[NUM](nextvalue, isPrimeResult, nth),
+        CheckedValue[NUM](nextvalue, isPrimeResult, nextvalue.toString.size, nth),
         if (isPrimeResult) nextPrimeNth + one else nextPrimeNth,
         if (isPrimeResult) nextNotPrimeNth else nextNotPrimeNth + one)
     }
