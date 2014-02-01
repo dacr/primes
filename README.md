@@ -12,6 +12,7 @@ It will generate a PNG image file named "ulam-spiral-500.png"
 
 To starts the console and play with primes :
 
+'''
 $ sbt console"
 
 scala> val ngen = new PrimesGenerator[Long]
@@ -66,5 +67,6 @@ CheckedValue(104801,true,10007)
 CheckedValue(104803,true,10008)
 CheckedValue(104827,true,10009)
 CheckedValue(104831,true,10010)
+'''
 
 and so one...
