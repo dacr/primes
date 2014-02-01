@@ -33,9 +33,9 @@ class PrimesTest extends FunSuite with ShouldMatchers {
   test("Simple tests") {
     val pgen = new PrimesGenerator[Long]
     import pgen._
-    primeStream.take(3) should equal(List(2, 3, 5))
-    primeStream.drop(3).head should equal(7)
-    primeStream.drop(999).head should equal(7919)
+    primes.take(3) should equal(List(2, 3, 5))
+    primes.drop(3).head should equal(7)
+    primes.drop(999).head should equal(7919)
   }
 
   val perfTestSeries = List(25000, 50000, 75000, 100000)
@@ -44,28 +44,28 @@ class PrimesTest extends FunSuite with ShouldMatchers {
     val pgen = new PrimesGenerator[Long]
     import pgen._
     for (sz <- perfTestSeries)
-      howlongfor(sz, primeStream.drop(_).head)("lastPrime=" + _.toString)
+      howlongfor(sz, primes.drop(_).head)("lastPrime=" + _.toString)
   }
 
   test("Performance classic tests - BigInt") {
     val pgen = new PrimesGenerator[BigInt]
     import pgen._
     for (sz <- perfTestSeries)
-      howlongfor(sz, primeStream.drop(_).head)("lastPrime=" + _.toString)
+      howlongfor(sz, primes.drop(_).head)("lastPrime=" + _.toString)
   }
   
   test("Performance parallel tests - Long") {
     val pgen = new PrimesGenerator[Long]
     import pgen._
     for (sz <- perfTestSeries)
-      howlongfor(sz, primeStreamPar.drop(_).head)("lastPrime=" + _.toString)
+      howlongfor(sz, primesPar.drop(_).head)("lastPrime=" + _.toString)
   }
   
   test("Performance parallel tests - BigInt") {
     val pgen = new PrimesGenerator[BigInt]
     import pgen._
     for (sz <- perfTestSeries)
-      howlongfor(sz, primeStreamPar.drop(_).head)("lastPrime=" + _.toString)
+      howlongfor(sz, primesPar.drop(_).head)("lastPrime=" + _.toString)
   }
 
 }

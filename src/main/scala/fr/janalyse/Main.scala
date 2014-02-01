@@ -44,7 +44,7 @@ object Main {
       if (remain > 0) drawit(x + 1, y - 1, sz + 2, remain - 2 * sz - 2 * (sz - 1), ints)
     }
 
-    drawit(xc, yc, 1, width * height, (candidatesStream).toIterator)
+    drawit(xc, yc, 1, width * height, (candidates).toIterator)
     gr.setColor(Color.RED)
     gr.drawRect(xc, yc, 0, 0)
     bi
