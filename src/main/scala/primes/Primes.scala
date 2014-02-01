@@ -60,7 +60,7 @@ object Primes {
   def primeStreamPar =
     candidatesStream
       .iterator //  workaround for Memory impact of the .par on just stream is too huge...
-      .grouped(10000)
+      .grouped(1000)
       .map(_.par)
       .flatMap(_.filter(isPrime(_)))
       .toStream

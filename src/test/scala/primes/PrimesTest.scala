@@ -8,21 +8,27 @@
 package primes
 
 import Primes._
-
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.junit.JUnitRunner
+import java.lang.management.ManagementFactory
 
 @RunWith(classOf[JUnitRunner])
 class PrimesTest extends FunSuite with ShouldMatchers {
 
-  def howlongfor[T](param:Int, proc : Int =>T) : T = {
+  val cpuCount = java.lang.Runtime.getRuntime.availableProcessors
+  val os = ManagementFactory.getOperatingSystemMXBean()
+  def lastMinuteCpuAverage()=(os.getSystemLoadAverage()*100).toInt
+  
+
+  def howlongfor[T](param:Int, proc : Int =>T)(infoOnResult: T => String) : T = {
     def now = System.currentTimeMillis
     now match {
       case start =>
         val result = proc(param)
-        info(s"duration for $param : ${now-start}ms")
+        //val cpu = lastMinuteCpuAverage() // cpu=${cpu}%
+        info(s"duration for $param : ${now-start}ms ${infoOnResult(result)}")
         result
     }
   }
@@ -37,11 +43,11 @@ class PrimesTest extends FunSuite with ShouldMatchers {
   
   test("Performance classic tests") {
     for (sz <- perfTestSeries) 
-       howlongfor(sz, primeStream.drop(_).head)
+       howlongfor(sz, primeStream.drop(_).head)("lastPrime="+_.toString)
   }
   
   test("Performance parallel tests") {
     for (sz <- perfTestSeries) 
-      howlongfor(sz, primeStreamPar.drop(_).head)
+      howlongfor(sz, primeStreamPar.drop(_).head)("lastPrime="+_.toString)
   }
 }
