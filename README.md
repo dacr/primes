@@ -66,6 +66,11 @@ CheckedValue(104801,true,10007)
 CheckedValue(104803,true,10008)
 CheckedValue(104827,true,10009)
 CheckedValue(104831,true,10010)
+
+scala> mersennePrimes.take(8).toList
+res6: List[Long] = List(3, 7, 31, 127, 8191, 131071, 524287, 2147483647)
+  (for mersenne primes, switch to BigInt...)
+  
 ```
 
 and so one...
