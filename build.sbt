@@ -4,7 +4,7 @@ seq(assemblySettings: _*)
 
 name := "primes"
 
-version := "1.0.3"
+version := "1.0.4"
 
 organization :="fr.janalyse"
 

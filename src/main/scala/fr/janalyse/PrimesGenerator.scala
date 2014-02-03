@@ -87,7 +87,7 @@ class PrimesGenerator[NUM](implicit numops: Integral[NUM]) {
     next(one)
   }
 
-  private def checkedValues(
+  def checkedValues(
     cur: CheckedValue[NUM],
     primeNth: NUM,
     notPrimeNth: NUM): Stream[CheckedValue[NUM]] =
