@@ -9,8 +9,9 @@ package fr.janalyse.primes
 case class CheckedValue[NUM](
   value: NUM,
   isPrime: Boolean,
-  digitCount:Long,
+  digitCount: Long,
   nth: NUM)(implicit numops: Integral[NUM])
+
 
 object CheckedValue {
   def first[NUM](implicit numops: Integral[NUM]): CheckedValue[NUM] = {
@@ -18,6 +19,7 @@ object CheckedValue {
     CheckedValue(one + one, true, 1, one)
   }
 }
+
 
 class PrimesGenerator[NUM](implicit numops: Integral[NUM]) {
 
@@ -66,16 +68,16 @@ class PrimesGenerator[NUM](implicit numops: Integral[NUM]) {
     (v <= three) || checkUpTo(two)
   }
 
-  def isMersennePrimeExponent(v: NUM, primeTest:NUM=>Boolean = isPrime): Boolean =
+  def isMersennePrimeExponent(v: NUM, primeTest: NUM => Boolean = isPrime): Boolean =
     primeTest(v) && primeTest(pow(two, v) - one)
 
-  def isSexyPrime(v: NUM, primeTest:NUM=>Boolean = isPrime): Boolean =
+  def isSexyPrime(v: NUM, primeTest: NUM => Boolean = isPrime): Boolean =
     primeTest(v) && primeTest(v + six)
 
-  def isTwinPrime(v: NUM, primeTest:NUM=>Boolean = isPrime): Boolean =
+  def isTwinPrime(v: NUM, primeTest: NUM => Boolean = isPrime): Boolean =
     primeTest(v) && primeTest(v + two)
 
-  def isIsolatedPrime(v: NUM, primeTest:NUM=>Boolean = isPrime): Boolean =
+  def isIsolatedPrime(v: NUM, primeTest: NUM => Boolean = isPrime): Boolean =
     !primeTest(v - two) && primeTest(v) && !primeTest(v + two)
 
   // ------------------------ STREAMS ------------------------
@@ -85,21 +87,22 @@ class PrimesGenerator[NUM](implicit numops: Integral[NUM]) {
     next(one)
   }
 
-  def checkedValues(
+  private def checkedValues(
     cur: CheckedValue[NUM],
-    nextPrimeNth: NUM,
-    nextNotPrimeNth: NUM): Stream[CheckedValue[NUM]] =
+    primeNth: NUM,
+    notPrimeNth: NUM): Stream[CheckedValue[NUM]] =
     cur #:: {
       val nextvalue = cur.value + one
       val isPrimeResult = isPrime(nextvalue)
-      val nth = if (isPrimeResult) nextPrimeNth else nextNotPrimeNth
+      val nth = if (isPrimeResult) primeNth+one else notPrimeNth+one
       checkedValues(
         CheckedValue[NUM](nextvalue, isPrimeResult, nextvalue.toString.size, nth),
-        if (isPrimeResult) nextPrimeNth + one else nextPrimeNth,
-        if (isPrimeResult) nextNotPrimeNth else nextNotPrimeNth + one)
+        if (isPrimeResult) nth else primeNth,
+        if (isPrimeResult) notPrimeNth else nth)
     }
 
-  def checkedValues: Stream[CheckedValue[NUM]] = checkedValues(CheckedValue.first[NUM], two, one)
+  def checkedValues: Stream[CheckedValue[NUM]] =
+    checkedValues(CheckedValue.first[NUM], one, zero)
 
   def candidates = integers.tail
 
@@ -112,12 +115,12 @@ class PrimesGenerator[NUM](implicit numops: Integral[NUM]) {
       .filterNot(isPrime(_))
 
   // distances between consecutive primes
-  def distances = 
+  def distances =
     primes
-       .sliding(2,1)
-       .map(slice => slice.tail.head - slice.head)
-       .toStream
-      
+      .sliding(2, 1)
+      .map(slice => slice.tail.head - slice.head)
+      .toStream
+
   def primesPar =
     candidates
       .iterator //  workaround for Memory impact of the .par on just stream is too huge...
