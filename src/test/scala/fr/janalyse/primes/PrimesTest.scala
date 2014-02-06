@@ -84,4 +84,11 @@ class PrimesTest extends FunSuite with ShouldMatchers {
       howlongfor(sz, primesPar.drop(_).head)("lastPrime=" + _.toString)
   }
 
+  test("factorize tests") {
+    val pgen = new PrimesGenerator[BigInt]
+    
+    pgen.factorize(9, pgen.primes.toIterator) should equal(List(3, 3))
+    pgen.factorize(1236, pgen.primes.toIterator) should equal(List(103, 3, 2, 2))
+    
+  }  
 }

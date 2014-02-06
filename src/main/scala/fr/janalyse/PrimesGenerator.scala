@@ -68,6 +68,22 @@ class PrimesGenerator[NUM](implicit numops: Integral[NUM]) {
     (v <= three) || checkUpTo(two)
   }
 
+  /*
+   * This is a generic method, that will have improved performance if
+   * we can provide it with already computed primes stream
+   */
+  def factorize(value:NUM, primesGetter: =>Iterator[NUM]):List[NUM] = {
+    val primes2test = primesGetter
+    @tailrec
+    def factit(current:NUM, prime:NUM, acc:List[NUM]):List[NUM] = {
+      if (! primes2test.hasNext || current == 1 || prime == value) acc
+      else if (current % prime == zero) factit(current/prime, prime, prime::acc)
+      else factit(current, primes2test.next, acc)
+    }
+    val prime4start = primes2test.next
+    factit(value, prime4start, Nil)
+  }
+  
   def isMersennePrimeExponent(v: NUM, primeTest: NUM => Boolean = isPrime): Boolean =
     primeTest(v) && primeTest(pow(two, v) - one)
 

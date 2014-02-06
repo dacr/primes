@@ -4,7 +4,7 @@ seq(assemblySettings: _*)
 
 name := "primes"
 
-version := "1.0.4"
+version := "1.0.5"
 
 organization :="fr.janalyse"
 
@@ -23,7 +23,7 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "2.0" % "test"
 libraryDependencies += "junit" % "junit" % "4.+" % "test"
 
 initialCommands in console := """
-import fr.janalyse.primes._
+  import fr.janalyse.primes._
 """
 
 sourceGenerators in Compile <+= 
