@@ -4,7 +4,7 @@ seq(assemblySettings: _*)
 
 name := "primes"
 
-version := "1.0.5"
+version := "1.0.6"
 
 organization :="fr.janalyse"
 
@@ -24,6 +24,7 @@ libraryDependencies += "junit" % "junit" % "4.+" % "test"
 
 initialCommands in console := """
   import fr.janalyse.primes._
+  val pgen=new PrimesGenerator[Long]
 """
 
 sourceGenerators in Compile <+= 
