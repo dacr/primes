@@ -115,18 +115,21 @@ class PrimesGenerator[NUM](implicit numops: Integral[NUM]) {
     gr.clearRect(0, 0, width, height)
     gr.setColor(Color.WHITE)
 
-    def draw(x: Int, y: Int, val2test: CheckedValue[NUM]) {
-      if (val2test.isPrime) gr.drawRect(x, y, 0, 0)
+    def draw(x: Int, y: Int, ints: => Iterator[CheckedValue[NUM]]) {
+      if (ints.hasNext) {
+        val val2test = ints.next
+        if (val2test.isPrime) gr.drawRect(x, y, 0, 0)
+      }
     }
 
     @annotation.tailrec
     def drawit(x: Int, y: Int, sz: Int, remain: Int, ints: Iterator[CheckedValue[NUM]]) {
-      draw(x, y, ints.next)
-      for { i <- 1 to sz } draw(x, y + i, ints.next) // DOWN
-      for { i <- 1 to sz } draw(x - i, y + sz, ints.next) // LEFT
-      for { i <- 1 to sz + 1 } draw(x - sz, y + sz - i, ints.next) // UP
-      for { i <- 1 to sz } draw(x - sz + i, y - 1, ints.next) // RIGHT
-      if (remain > 0) drawit(x + 1, y - 1, sz + 2, remain - 2 * sz - 2 * (sz - 1), ints)
+      draw(x, y, ints)
+      for { i <- 1 to sz } draw(x, y + i, ints) // DOWN
+      for { i <- 1 to sz } draw(x - i, y + sz, ints) // LEFT
+      for { i <- 1 to sz + 1 } draw(x - sz, y + sz - i, ints) // UP
+      for { i <- 1 to sz } draw(x - sz + i, y - 1, ints) // RIGHT
+      if (remain > 0 && ints.hasNext) drawit(x + 1, y - 1, sz + 2, remain - 2 * sz - 2 * (sz - 1), ints)
     }
 
     drawit(xc, yc, 1, width * height, values)
