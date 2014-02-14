@@ -22,6 +22,11 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "2.0" % "test"
 
 libraryDependencies += "junit" % "junit" % "4.+" % "test"
 
+libraryDependencies += "com.typesafe.akka" %% "akka-actor" % "2.2.3"
+
+resolvers += "Typesafe repository releases" at "http://repo.typesafe.com/typesafe/releases/"
+
+
 initialCommands in console := """
   import fr.janalyse.primes._
   val pgen=new PrimesGenerator[Long]
