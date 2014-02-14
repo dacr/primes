@@ -16,8 +16,9 @@ object Main {
   def ulamSpiralToPng(size: Int) {
     import java.io.File
     import javax.imageio.ImageIO
-    val bi = ulamSpiral(size, checkedValues.iterator)
-    ImageIO.write(bi, "PNG", new File(s"ulam-spiral-${size}.png"));
+
+    ImageIO.write(ulamSpiral(size, checkedValues.iterator), "PNG", new File(s"ulam-spiral-${size}.png"));
+    ImageIO.write(sacksInspiredSpiral(size, 3, checkedValues.iterator), "PNG", new File(s"ulam-sacks-like-${size}.png"));
   }
 
   // -------------------------------------------------------------

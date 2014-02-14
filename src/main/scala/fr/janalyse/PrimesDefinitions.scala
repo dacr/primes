@@ -3,8 +3,8 @@ package fr.janalyse.primes
 import java.awt.geom.Ellipse2D
 import java.awt.image.BufferedImage
 import java.awt.Color
-
 import annotation.tailrec
+import java.awt.Graphics2D
 
 class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
 
@@ -86,7 +86,12 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
     factit(value, prime4start, Nil)
   }
 
-  def ulamSpiral(size: Int, values: => Iterator[CheckedValue[NUM]]): BufferedImage = {
+  
+//  def sacksSpiral(size:Int, values: => Iterator[CheckedValue[NUM]], len:Int): BufferedImage = {
+
+//  }
+
+  private def spiral(size: Int, draw: (Graphics2D, Int,Int,Int)=>Unit): BufferedImage = {
     val width = size
     val height = size
     val xc = width / 2
@@ -97,27 +102,38 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
     gr.clearRect(0, 0, width, height)
     gr.setColor(Color.WHITE)
 
-    def draw(x: Int, y: Int, ints: => Iterator[CheckedValue[NUM]]) {
-      if (ints.hasNext) {
-        val val2test = ints.next
-        if (val2test.isPrime) gr.drawRect(x, y, 0, 0)
-      }
-    }
 
     @tailrec
-    def drawit(x: Int, y: Int, sz: Int, remain: Int, ints: Iterator[CheckedValue[NUM]]) {
-      draw(x, y, ints)
-      for { i <- 1 to sz } draw(x, y + i, ints) // DOWN
-      for { i <- 1 to sz } draw(x - i, y + sz, ints) // LEFT
-      for { i <- 1 to sz + 1 } draw(x - sz, y + sz - i, ints) // UP
-      for { i <- 1 to sz } draw(x - sz + i, y - 1, ints) // RIGHT
-      if (remain > 0 && ints.hasNext) drawit(x + 1, y - 1, sz + 2, remain - 2 * sz - 2 * (sz - 1), ints)
+    def spiral(x: Int, y: Int, sz: Int, remain: Int, len:Int) {
+      draw(gr, x, y, len)
+      for { i <- 1 to sz } draw(gr, x, y + i,len+1) // DOWN
+      for { i <- 1 to sz } draw(gr, x - i, y + sz, len+2) // LEFT
+      for { i <- 1 to sz + 1 } draw(gr, x - sz, y + sz - i, len+3) // UP
+      for { i <- 1 to sz } draw(gr, x - sz + i, y - 1, len+4) // RIGHT
+      if (remain > 0) spiral(x + 1, y - 1, sz + 2, remain - 2 * sz - 2 * (sz - 1), len+5)
     }
 
-    drawit(xc, yc, 1, width * height, values)
+    spiral(xc, yc, 1, width * height, 0)
     gr.setColor(Color.RED)
     gr.drawRect(xc, yc, 0, 0)
     bi
+  }  
+  
+  
+  
+  def ulamSpiral(size: Int, values: Iterator[CheckedValue[NUM]]): BufferedImage = {
+    def draw(gr:Graphics2D, x: Int, y: Int, len:Int) {
+      if (values.hasNext && values.next.isPrime) gr.drawRect(x, y, 0, 0)
+    }
+    spiral(size, draw)
+  }
+
+  
+  def sacksInspiredSpiral(size: Int, interval:Int, values: Iterator[CheckedValue[NUM]]): BufferedImage = {
+    def draw(gr:Graphics2D, x: Int, y: Int, len:Int) {
+      if (values.hasNext && (len%interval==0) && values.next.isPrime) gr.drawRect(x, y, 0, 0)
+    }
+    spiral(size, draw)
   }
 
 }
