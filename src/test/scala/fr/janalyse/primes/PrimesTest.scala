@@ -54,6 +54,20 @@ class PrimesTest extends FunSuite with ShouldMatchers {
     values.filterNot(_.isPrime).take(5).map(_.value) should equal(List(4,6,8,9,10))
   }
   
+  test("Resume checked value tests") {
+    val pgen=new PrimesGenerator[Long]
+    
+    val starts=pgen.checkedValues.takeWhile(_.value<=10)
+    val lastPrime=starts.filter(_.isPrime).lastOption
+    val lastNotPrime=starts.filterNot(_.isPrime).lastOption
+    
+    val resumed = pgen.checkedValues(lastPrime, lastNotPrime).takeWhile(_.value<=20)
+    resumed.filter(_.isPrime).map(_.value) should equal(List(11,13,17,19))
+    resumed.filter(_.isPrime).map(_.nth) should equal(List(5,6,7,8))
+    resumed.filterNot(_.isPrime).map(_.value) should equal(List(12,14,15,16,18,20))
+    resumed.filterNot(_.isPrime).map(_.nth) should equal(List(6,7,8,9,10,11))
+  }
+  
   val perfTestSeries = List(10000, 25000, 50000)
 
   test("Performance classic tests - Long") {
