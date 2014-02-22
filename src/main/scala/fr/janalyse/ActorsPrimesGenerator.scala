@@ -29,10 +29,10 @@ class ActorsPrimesGenerator[NUM](
   case class PartialResult(value:NUM, isPrime:Boolean)
   case class NextCheckedValue()
   
-  class CheckerActor extends Actor {
+  class CheckerActor(valuesManager:ActorRef) extends Actor {
     def receive = {
       case NextValue(value) =>
-        manager ! PartialResult(value, isPrime(value))
+        valuesManager ! PartialResult(value, isPrime(value))
     }
   }
   
@@ -40,7 +40,7 @@ class ActorsPrimesGenerator[NUM](
    * it manage checked values order and affect the right position to
    * primes and not primes values.
    */
-  class ValuesManagerActor(precomputedCount:Int=10000, checkerWorkers:Int=4) extends Actor {
+  class ValuesManagerActor(forActor:ActorRef, precomputedCount:Int=10000, checkerWorkers:Int=4) extends Actor {
     val vma = self
     val checkerRouter = system.actorOf(
         Props(classOf[CheckerActor], vma).withRouter(SmallestMailboxRouter(checkerWorkers)),
@@ -57,50 +57,58 @@ class ActorsPrimesGenerator[NUM](
     private var checkedValuesQueue = Queue.empty[CheckedValue[NUM]]
 
     
-    private def addPrime(partial:PartialResult) {
+    private def processPartialResult(partial:PartialResult) {
       val digitCount = partial.value.toString.size
-      if (partial.isPrime) {
-        val res = CheckedValue[NUM](partial.value, true, digitCount, currentPrimeNth)
-        currentPrimeNth+=one
-        checkedValuesQueue = checkedValuesQueue.enqueue(res)
-      } else {
-        val res = CheckedValue[NUM](partial.value, false, digitCount, currentNotPrimeNth)
-        currentNotPrimeNth+=one
-        checkedValuesQueue = checkedValuesQueue.enqueue(res)
-      }
       nextValue+=one
+      val nth = if (partial.isPrime) currentPrimeNth else currentNotPrimeNth
+      if (partial.isPrime) currentPrimeNth+=one else currentNotPrimeNth+=one
+      forActor ! CheckedValue[NUM](partial.value, partial.isPrime, digitCount, nth)
     }
+    
     private def flush2order() {
       while(waitBuffer.size>0 && waitBuffer.contains(nextValue)) {
         val pr = waitBuffer(nextValue)
-        addPrime(pr)
+        processPartialResult(pr)
         waitBuffer = waitBuffer - pr.value
       }
     }
     
-    private var currentUpTo=startFrom
-    private def addWorkIfRequired() {
-      //if (currentUpTo < nextValue + precomputedCount/2 ) {
-      //}
+    private def computeNext() {
+      checkerRouter ! NextValue(nextValue)
+      nextValue+=one      
     }
     
+    for { _ <- 1 to precomputedCount } computeNext()
     
     def receive = {
       case pr:PartialResult if pr.value == nextValue =>
-        addPrime(pr)
+        processPartialResult(pr)
         flush2order()
+        computeNext()
         
       case pr:PartialResult => // Then delay
         waitBuffer+=pr.value -> pr
+        computeNext()
         
-      case NextCheckedValue() =>
-        //val next =
-        //checkedValuesQueue = checkedValuesQueue.dequeue(res)
-        addWorkIfRequired()
     }
   }
   
+  class PrinterActor extends Actor{
+    def receive = {
+      case chk:CheckedValue[NUM] => 
+        import chk._
+        if (chk.isPrime) println(s"$value is the $nth prime number")
+        else println(s"$value is the $nth NOT prime number")
+    }
+  }
   
-  private val manager =  system.actorOf(Props(classOf[ValuesManagerActor], 10000), "ValueManagerActor")
+  private val printer = actor("ValuesPrinter") {
+    new PrinterActor
+  }
+  
+  private val manager =  actor("ValuesManagerActor") {
+    new ValuesManagerActor(printer, precomputedCount=10000, checkerWorkers=6)
+  }
+
   
 }
