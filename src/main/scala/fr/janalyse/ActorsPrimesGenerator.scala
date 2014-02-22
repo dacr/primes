@@ -5,6 +5,11 @@ import ActorDSL._
 import akka.routing.SmallestMailboxRouter
 import scala.collection.immutable.Queue
 
+
+object ActorsPrimesGenerator {
+}
+
+
 class ActorsPrimesGenerator[NUM](
   name: String = "DefaultPrimesGeneratorSystem",
   startFrom: NUM = 2,
@@ -14,25 +19,13 @@ class ActorsPrimesGenerator[NUM](
 
   implicit val system = ActorSystem(name)
 
-  case class WantNextValue()
   case class NextValue(value: NUM)
-
-  class NextValueActor extends Actor {
-    private var value = startFrom
-    def receive = {
-      case WantNextValue() =>
-        sender ! NextValue(value)
-        value += one
-    }
-  }
-
   case class PartialResult(value:NUM, isPrime:Boolean)
-  case class NextCheckedValue()
   
-  class CheckerActor(valuesManager:ActorRef) extends Actor {
+  class CheckerActor extends Actor {
     def receive = {
       case NextValue(value) =>
-        valuesManager ! PartialResult(value, isPrime(value))
+        context.parent ! PartialResult(value, isPrime(value))
     }
   }
   
@@ -41,9 +34,8 @@ class ActorsPrimesGenerator[NUM](
    * primes and not primes values.
    */
   class ValuesManagerActor(forActor:ActorRef, precomputedCount:Int=10000, checkerWorkers:Int=4) extends Actor {
-    val vma = self
-    val checkerRouter = system.actorOf(
-        Props(classOf[CheckerActor], vma).withRouter(SmallestMailboxRouter(checkerWorkers)),
+    val checkerRouter = context.actorOf(
+        Props(classOf[CheckerActor]).withRouter(SmallestMailboxRouter(checkerWorkers)),
         "CheckerActorRouter")
     
     private var currentPrimeNth=primeNth
