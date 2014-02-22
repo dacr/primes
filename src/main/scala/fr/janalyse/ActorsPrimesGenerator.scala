@@ -36,8 +36,11 @@ class ActorsPrimesGenerator[NUM](
     }
   }
   
-  
-  class ValuesManagerActor extends Actor {
+  /* ValuesManagerActor is the primes computation coordinators
+   * it manage checked values order and affect the right position to
+   * primes and not primes values.
+   */
+  class ValuesManagerActor(precomputedCount:Int) extends Actor {
     val vma = self
     val checkerRouter = system.actorOf(
         Props(classOf[CheckerActor], vma).withRouter(SmallestMailboxRouter(4)),
@@ -45,32 +48,49 @@ class ActorsPrimesGenerator[NUM](
     
     private var currentPrimeNth=primeNth
     private var currentNotPrimeNth=notPrimeNth
-    private var buffer=List.empty[NUM]
     private var nextValue=startFrom
-    
+
+    private var waitBuffer=Map.empty[NUM, PartialResult]
+    // checked values precomputed cache
     private var checkedValuesQueue = Queue.empty[CheckedValue[NUM]]
     
-    def receive = {
-      case PartialResult(value, true) if value == nextValue =>
+    private def addPrime(partial:PartialResult) {
+      val digitCount = partial.value.toString.size
+      if (partial.isPrime) {
         currentPrimeNth+=one
-        val res = CheckedValue[NUM](value, true, value.toString.size, currentPrimeNth)
+        val res = CheckedValue[NUM](partial.value, true, digitCount, currentPrimeNth)
         checkedValuesQueue = checkedValuesQueue.enqueue(res)
-        
-      case PartialResult(value, false) if value == nextValue =>
+      } else {
         currentNotPrimeNth+=one
-        val res = CheckedValue[NUM](value, false, value.toString.size, currentNotPrimeNth)
+        val res = CheckedValue[NUM](partial.value, false, digitCount, currentNotPrimeNth)
         checkedValuesQueue = checkedValuesQueue.enqueue(res)
+      }
+      nextValue+=one
+    }
+    private def defragment() {
+      while(waitBuffer.size>0 && waitBuffer.contains(nextValue)) {
+        val pr = waitBuffer(nextValue)
+        addPrime(pr)
+        waitBuffer = waitBuffer - pr.value
+      }
+    }
+    
+    def receive = {
+      case pr:PartialResult if pr.value == nextValue =>
+        addPrime(pr)
+        defragment()
+        
+      case pr:PartialResult => // Then delay
+        waitBuffer+=pr.value -> pr
         
       case NextCheckedValue() =>
         //val next =
         //checkedValuesQueue = checkedValuesQueue.enqueue(res)
         
-      case pr:PartialResult => // Then delay
-        
     }
   }
   
   
-  private val manager =  system.actorOf(Props[ValuesManagerActor], "ValueManagerActor")
+  private val manager =  system.actorOf(Props(classOf[ValuesManagerActor], 1000), "ValueManagerActor")
   
 }
