@@ -34,15 +34,18 @@ class ActorsPrimesGenerator[NUM](
    * it manage checked values order and affect the right position to
    * primes and not primes values.
    */
-  class ValuesManagerActor(forActor:ActorRef, precomputedCount:Int=10000, checkerWorkers:Int=4) extends Actor {
+  class ValuesManagerActor(
+      forActor:ActorRef,
+      precomputedCount:Int=1000,
+      checkerWorkers:Int=Runtime.getRuntime.availableProcessors) extends Actor {
     val checkerRouter = context.actorOf(
         CheckerActor.props.withRouter(SmallestMailboxRouter(checkerWorkers)),
         "CheckerActorRouter")
     
-    private var currentPrimeNth=primeNth
-    private var currentNotPrimeNth=notPrimeNth
-    private var currentValue=startFrom
-    private var nextValue=startFrom
+    private var nextPrimeNth=primeNth
+    private var nextNotPrimeNth=notPrimeNth
+    private var currentValue=startFrom  // waiting the result for this value
+    private var nextValue=startFrom     // next value to send to checker worker
 
     // buffered partial results, because we need ordering to compute primes & not primes position 
     private var waitBuffer=Map.empty[NUM, PartialResult]
@@ -54,9 +57,11 @@ class ActorsPrimesGenerator[NUM](
     private def processPartialResult(partial:PartialResult) {
       val digitCount = partial.value.toString.size
       currentValue+=one
-      val nth = if (partial.isPrime) currentPrimeNth else currentNotPrimeNth
-      if (partial.isPrime) currentPrimeNth+=one else currentNotPrimeNth+=one
-      forActor ! CheckedValue[NUM](partial.value, partial.isPrime, digitCount, nth)
+      val nth = if (partial.isPrime) nextPrimeNth else nextNotPrimeNth
+      if (partial.isPrime) nextPrimeNth+=one else nextNotPrimeNth+=one
+      val newResult = CheckedValue[NUM](partial.value, partial.isPrime, digitCount, nth)
+      forActor ! newResult
+      //checkedValuesQueue.enqueue(newResult)
     }
     
     private def flush2order() {
@@ -107,7 +112,7 @@ class ActorsPrimesGenerator[NUM](
   }
   
   private val manager =  actor("ValuesManagerActor") {
-    new ValuesManagerActor(printer, precomputedCount=1000, checkerWorkers=8)
+    new ValuesManagerActor(printer)
   }
 
 }
