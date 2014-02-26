@@ -88,10 +88,14 @@ class ActorsPrimesGenerator[NUM](
   }
   
   class PrinterActor extends Actor{
+    var counter:Long=0l
     def receive = {
       case chk:CheckedValue[NUM] => 
         import chk._
-        if (chk.isPrime) println(s"$value is the $nth prime number")
+        if (chk.isPrime) { 
+	  counter +=1
+	  if (counter % 10000L == 0L) println(s"$value is the $nth prime number")  // decrease println usage to avoid mailbox congestion
+	}
         //else println(s"$value is the $nth NOT prime number")
     }
   }
