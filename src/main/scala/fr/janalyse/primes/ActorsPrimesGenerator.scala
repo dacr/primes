@@ -4,6 +4,7 @@ import akka.actor._
 import ActorDSL._
 import akka.routing.SmallestMailboxRouter
 import scala.collection.immutable.Queue
+import com.typesafe.config.ConfigFactory
 
 class ActorsPrimesGenerator[NUM](
   name: String = "DefaultPrimesGeneratorSystem",
@@ -12,7 +13,8 @@ class ActorsPrimesGenerator[NUM](
   notPrimeNth: NUM = 0)(implicit numops: Integral[NUM]) extends PrimesDefinitions[NUM] {
   import numops._
 
-  implicit val system = ActorSystem(name)
+  val config = ConfigFactory.load()
+  implicit val system = ActorSystem(name, config.getConfig("primes").withFallback(config))
 
   case class NextValue(value: NUM)
   case class PartialResult(value: NUM, isPrime: Boolean)
@@ -108,7 +110,7 @@ class ActorsPrimesGenerator[NUM](
   
   
   class PrinterActor[NUM] extends Actor {
-    val groupedAckSize=10000L
+    val groupedAckSize=1L
     def now = System.currentTimeMillis()
     var counter: Long = 0l
     var valuesCounter: Long=0l
