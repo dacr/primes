@@ -28,15 +28,15 @@ class ActorsPrimesGenerator[NUM](
     }
   }
 
-  /* ValuesManagerActor is the primes computation coordinators
-   * it manage checked values order and affect the right position to
+  /* ValuesManagerActor is the primes computation coordinator
+   * it manages checked values order and affect the right position to
    * primes and not primes values.
    */
-  case class CheckedValueAckMessage()
+  case class CheckedValueAckMessage(count:Long)
   
   class ValuesManagerActor(
     forActor: ActorRef,
-    precomputedCount: Int = 1000,
+    precomputedCount: Int = 20000,
     checkerWorkers: Int = Runtime.getRuntime.availableProcessors) extends Actor {
     val checkerRouter = context.actorOf(
       CheckerActor.props.withRouter(SmallestMailboxRouter(checkerWorkers)),
@@ -73,7 +73,7 @@ class ActorsPrimesGenerator[NUM](
     }
 
     private def prepareNexts() {
-      if (sentAckDelta < 100) {
+      if (sentAckDelta < 10000) {
         for { _ <- inpg to precomputedCount } {
           checkerRouter ! NextValue(nextValue)
           nextValue += one
@@ -96,8 +96,8 @@ class ActorsPrimesGenerator[NUM](
         waitBuffer += pr.value -> pr
         prepareNexts()
         
-      case _: CheckedValueAckMessage =>
-        sentAckDelta-=1L
+      case CheckedValueAckMessage(count) =>
+        sentAckDelta-=count
         prepareNexts()
         
     }
@@ -108,16 +108,31 @@ class ActorsPrimesGenerator[NUM](
   
   
   class PrinterActor[NUM] extends Actor {
+    val groupedAckSize=5000L
+    def now = System.currentTimeMillis()
     var counter: Long = 0l
+    var valuesCounter: Long=0l
+    val startedTime = now
+    var lastOutputTime = now
+    def timeSpentSinceStartInS = (now-startedTime)/1000
+    def timeSpentSinceLastOutput = {
+      val newLastOutputTime = now
+      val r = (newLastOutputTime-lastOutputTime)
+      lastOutputTime = newLastOutputTime
+      r
+    }
     def receive = {
       case chk: CheckedValue[NUM] =>
         import chk._
         if (chk.isPrime) {
           counter += 1
           // take care with println usage to avoid mailbox congestion
-          if (counter % 10000L == 0L) println(s"$value is the $nth prime number")
+          if (counter % 10000L == 0L) {
+            println(s"$value is the $nth prime number. ${timeSpentSinceStartInS}s - ${timeSpentSinceLastOutput}ms")
+          }
         }
-        sender ! CheckedValueAckMessage() 
+        valuesCounter+=1
+        if (valuesCounter%groupedAckSize == 0L) sender ! CheckedValueAckMessage(groupedAckSize) 
     }
   }
 
