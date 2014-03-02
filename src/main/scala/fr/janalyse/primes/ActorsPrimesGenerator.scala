@@ -36,7 +36,7 @@ class ActorsPrimesGenerator[NUM](
   
   class ValuesManagerActor(
     forActor: ActorRef,
-    precomputedCount: Int = 20000,
+    precomputedCount: Int = 30000,
     checkerWorkers: Int = Runtime.getRuntime.availableProcessors) extends Actor {
     val checkerRouter = context.actorOf(
       CheckerActor.props.withRouter(SmallestMailboxRouter(checkerWorkers)),
@@ -73,7 +73,7 @@ class ActorsPrimesGenerator[NUM](
     }
 
     private def prepareNexts() {
-      if (sentAckDelta < 10000) {
+      if (sentAckDelta < 20000) {
         for { _ <- inpg to precomputedCount } {
           checkerRouter ! NextValue(nextValue)
           nextValue += one
@@ -108,7 +108,7 @@ class ActorsPrimesGenerator[NUM](
   
   
   class PrinterActor[NUM] extends Actor {
-    val groupedAckSize=5000L
+    val groupedAckSize=10000L
     def now = System.currentTimeMillis()
     var counter: Long = 0l
     var valuesCounter: Long=0l
