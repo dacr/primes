@@ -110,7 +110,7 @@ class ActorsPrimesGenerator[NUM](
   
   
   class PrinterActor[NUM] extends Actor {
-    val groupedAckSize=1L
+    val groupedAckSize=500L
     def now = System.currentTimeMillis()
     var counter: Long = 0l
     var valuesCounter: Long=0l
