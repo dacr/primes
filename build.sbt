@@ -4,21 +4,23 @@ seq(assemblySettings: _*)
 
 name := "primes"
 
-version := "1.0.9"
+version := "1.0.10"
 
 organization :="fr.janalyse"
 
 organizationHomepage := Some(new URL("http://www.janalyse.fr"))
 
-scalaVersion := "2.10.3"
+scalaVersion := "2.10.4"
 
-scalacOptions ++= Seq("-unchecked", "-deprecation" )
+scalacOptions ++= Seq( "-deprecation", "-unchecked", "-feature")
+
+crossScalaVersions := Seq("2.10.4", "2.11.0")
 
 mainClass in assembly := Some("fr.janalyse.primes.Main")
 
 jarName in assembly := "primes.jar"
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "2.0" % "test"
+libraryDependencies += "org.scalatest" %% "scalatest" % "2.1.5" % "test"
 
 libraryDependencies += "junit" % "junit" % "4.+" % "test"
 
