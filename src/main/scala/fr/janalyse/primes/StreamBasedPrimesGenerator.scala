@@ -15,7 +15,7 @@ class StreamBasedPrimesGenerator[NUM](
   notPrimeNth: NUM = 0)(implicit numops: Integral[NUM]) extends PrimesDefinitions[NUM] {
   import numops._
 
-  implicit val system = ActorSystem("Sys")
+  implicit val system = ActorSystem(name)
   import system.dispatcher
   implicit val materializer = FlowMaterializer()
 
@@ -27,8 +27,10 @@ class StreamBasedPrimesGenerator[NUM](
       num
     }
     val lmax:NUM = five*ten*ten*ten*ten
-    override def hasNext(): Boolean = num < lmax // < 50000
+    override def hasNext(): Boolean = true // num < lmax // < 50000
   }
+  
+  val started=now
 
   private val numIterator = new NumIterator()
   val primeSource: Source[NUM] =
@@ -38,7 +40,12 @@ class StreamBasedPrimesGenerator[NUM](
   val nopSink = ForeachSink[NUM](w => {})
   val consoleSink = ForeachSink[NUM](println)
 
-  val started=System.currentTimeMillis()
+  def now=System.currentTimeMillis()
+  def followperf(n:NUM) {
+    println(s"$n is a prime number. ${(now-started)/1000}s")
+  }
+  val perfSink = ForeachSink[NUM](followperf)
+  
   val output = new java.io.PrintWriter(new java.io.FileOutputStream("target/primes.txt"), true)
   val fileSink = ForeachSink[NUM] { prime =>
     val reldur = System.currentTimeMillis() - started
@@ -51,7 +58,7 @@ class StreamBasedPrimesGenerator[NUM](
     //primeSource ~> broadcast ~> slowSink // connect primes to splitter, and one side to file
     //broadcast ~> consoleSink // connect other side of splitter to console
     
-    primeSource ~> fileSink
+    primeSource ~> perfSink
   }.run()
 
 }
