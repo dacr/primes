@@ -13,7 +13,12 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
   protected val two = one + one
   protected val three = two + one
   protected val four = two + two
+  protected val five = four + one
   protected val six = three + three
+  protected val seven = four+three
+  protected val eight = four+four
+  protected val nine = five + four
+  protected val ten = five + five
 
   def pow(n: NUM, p: NUM): NUM = {
     @tailrec

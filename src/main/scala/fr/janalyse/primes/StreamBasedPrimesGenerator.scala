@@ -26,27 +26,32 @@ class StreamBasedPrimesGenerator[NUM](
       num = num + one
       num
     }
+    val lmax:NUM = five*ten*ten*ten*ten
+    override def hasNext(): Boolean = num < lmax // < 50000
   }
 
   private val numIterator = new NumIterator()
-  val primeSource: Source[NUM]
-  Source(() => numIterator)
-    .filter(rnd => isPrime(rnd))
+  val primeSource: Source[NUM] =
+    Source(() => numIterator)
+      .filter(rnd => isPrime(rnd))
 
-  val consoleSink = ForeachSink[Int](println)
+  val nopSink = ForeachSink[NUM](w => {})
+  val consoleSink = ForeachSink[NUM](println)
 
+  val started=System.currentTimeMillis()
   val output = new java.io.PrintWriter(new java.io.FileOutputStream("target/primes.txt"), true)
-  val slowSink = ForeachSink[Int] { prime =>
-    output.println(prime)
-    // simulate slow consumer
-    Thread.sleep(1000)
+  val fileSink = ForeachSink[NUM] { prime =>
+    val reldur = System.currentTimeMillis() - started
+    output.println(s"$prime  ($reldur)")
   }
 
   val materialized = FlowGraph { implicit builder =>
     import FlowGraphImplicits._
-    val broadcast = Broadcast[Int] // the splitter - like a Unix tee
-    primeSource ~> broadcast ~> slowSink // connect primes to splitter, and one side to file
-    broadcast ~> consoleSink // connect other side of splitter to console
+    //val broadcast = Broadcast[NUM] // the splitter - like a Unix tee
+    //primeSource ~> broadcast ~> slowSink // connect primes to splitter, and one side to file
+    //broadcast ~> consoleSink // connect other side of splitter to console
+    
+    primeSource ~> fileSink
   }.run()
 
 }
