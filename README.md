@@ -1,5 +1,4 @@
-primes
-======
+# primes core lib
 
 Playing with primes using scala language. Draw Ulam spiral, ...
 

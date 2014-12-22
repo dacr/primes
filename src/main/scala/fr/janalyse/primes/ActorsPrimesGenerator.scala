@@ -2,7 +2,7 @@ package fr.janalyse.primes
 
 import akka.actor._
 import ActorDSL._
-import akka.routing.SmallestMailboxRouter
+import akka.routing.SmallestMailboxPool
 import scala.collection.immutable.Queue
 import com.typesafe.config.ConfigFactory
 
@@ -41,7 +41,7 @@ class ActorsPrimesGenerator[NUM](
     precomputedCount: Int = 30000,
     checkerWorkers: Int = Runtime.getRuntime.availableProcessors) extends Actor {
     val checkerRouter = context.actorOf(
-      CheckerActor.props.withRouter(SmallestMailboxRouter(checkerWorkers)),
+      CheckerActor.props.withRouter(SmallestMailboxPool(checkerWorkers)),
       "CheckerActorRouter")
       
     

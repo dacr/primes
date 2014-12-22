@@ -4,7 +4,7 @@ seq(assemblySettings: _*)
 
 name := "primes"
 
-version := "1.0.10"
+version := "1.1.0"
 
 organization :="fr.janalyse"
 
@@ -14,17 +14,17 @@ scalaVersion := "2.10.4"
 
 scalacOptions ++= Seq( "-deprecation", "-unchecked", "-feature")
 
-crossScalaVersions := Seq("2.10.4", "2.11.0")
+crossScalaVersions := Seq("2.10.4", "2.11.4")
 
 mainClass in assembly := Some("fr.janalyse.primes.Main")
 
 jarName in assembly := "primes.jar"
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "2.1.5" % "test"
+libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.+" % "test"
 
 libraryDependencies += "junit" % "junit" % "4.+" % "test"
 
-libraryDependencies += "com.typesafe.akka" %% "akka-actor" % "2.2.3"
+libraryDependencies += "com.typesafe.akka" %% "akka-actor" % "2.3.8"
 
 resolvers += "Typesafe repository releases" at "http://repo.typesafe.com/typesafe/releases/"
 
