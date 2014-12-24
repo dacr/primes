@@ -146,4 +146,8 @@ class ActorsPrimesGenerator[NUM](
     new ValuesManagerActor(printer)
   }
 
+  def shutdown() {
+    system.shutdown()
+  }
+
 }

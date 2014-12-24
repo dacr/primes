@@ -61,5 +61,8 @@ class StreamBasedPrimesGenerator[NUM](
     primeSource ~> perfSink
   }.run()
 
+  def shutdown() {
+    system.shutdown()
+  }
 }
 

@@ -10,7 +10,7 @@ organization :="fr.janalyse"
 
 organizationHomepage := Some(new URL("http://www.janalyse.fr"))
 
-scalaVersion := "2.10.4"
+scalaVersion := "2.11.4"
 
 scalacOptions ++= Seq( "-deprecation", "-unchecked", "-feature")
 
@@ -26,7 +26,7 @@ libraryDependencies += "junit" % "junit" % "4.+" % "test"
 
 libraryDependencies ++= Seq(
    "com.typesafe.akka" %% "akka-actor" % "2.3.8",
-   "com.typesafe.akka" %% "akka-stream-experimental" % "1.0-M1"
+   "com.typesafe.akka" %% "akka-stream-experimental" % "1.0-M2"
 )
 
 resolvers += "Typesafe repository releases" at "http://repo.typesafe.com/typesafe/releases/"
