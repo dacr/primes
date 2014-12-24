@@ -7,7 +7,8 @@ import scala.collection.immutable.Queue
 import com.typesafe.config.ConfigFactory
 
 class ActorsPrimesGenerator[NUM](
-  name: String = "DefaultPrimesGeneratorSystem",
+  handler: CheckedValue[NUM] => Unit = ActorsPrimesGenerator.mkPrintHandler[NUM](),
+  name: String = "DefaultActordBasedPrimesGeneratorSystem",
   startFrom: NUM = 2,
   primeNth: NUM = 1,
   notPrimeNth: NUM = 0)(implicit numops: Integral[NUM]) extends PrimesDefinitions[NUM] {
@@ -34,8 +35,8 @@ class ActorsPrimesGenerator[NUM](
    * it manages checked values order and affect the right position to
    * primes and not primes values.
    */
-  case class CheckedValueAckMessage(count:Long)
-  
+  case class CheckedValueAckMessage(count: Long)
+
   class ValuesManagerActor(
     forActor: ActorRef,
     precomputedCount: Int = 30000,
@@ -43,8 +44,7 @@ class ActorsPrimesGenerator[NUM](
     val checkerRouter = context.actorOf(
       CheckerActor.props.withRouter(SmallestMailboxPool(checkerWorkers)),
       "CheckerActorRouter")
-      
-    
+
     private var nextPrimeNth = primeNth
     private var nextNotPrimeNth = notPrimeNth
     private var currentValue = startFrom // waiting the result for this value
@@ -53,8 +53,8 @@ class ActorsPrimesGenerator[NUM](
     // buffered partial results, because we need ordering to compute primes & not primes position 
     private var waitBuffer = Map.empty[NUM, PartialResult]
 
-    private var inpg=0L
-    private var sentAckDelta=0L
+    private var inpg = 0L
+    private var sentAckDelta = 0L
 
     private def processPartialResult(partial: PartialResult) {
       val digitCount = partial.value.toString.size
@@ -63,7 +63,7 @@ class ActorsPrimesGenerator[NUM](
       if (partial.isPrime) nextPrimeNth += one else nextNotPrimeNth += one
       val newResult = CheckedValue[NUM](partial.value, partial.isPrime, digitCount, nth)
       forActor ! newResult
-      sentAckDelta+=1L
+      sentAckDelta += 1L
     }
 
     private def flush2order() {
@@ -79,7 +79,7 @@ class ActorsPrimesGenerator[NUM](
         for { _ <- inpg to precomputedCount } {
           checkerRouter ! NextValue(nextValue)
           nextValue += one
-          inpg+=1
+          inpg += 1
         }
       }
     }
@@ -88,66 +88,73 @@ class ActorsPrimesGenerator[NUM](
 
     def receive = {
       case pr: PartialResult if pr.value == currentValue =>
-        inpg-=1
+        inpg -= 1
         processPartialResult(pr)
         flush2order()
         prepareNexts()
 
       case pr: PartialResult => // Then delay
-        inpg-=1
+        inpg -= 1
         waitBuffer += pr.value -> pr
         prepareNexts()
-        
+
       case CheckedValueAckMessage(count) =>
-        sentAckDelta-=count
+        sentAckDelta -= count
         prepareNexts()
-        
+
     }
-    
-    
   }
 
-  
-  
-  class PrinterActor[NUM] extends Actor {
-    val groupedAckSize=500L
-    def now = System.currentTimeMillis()
-    var counter: Long = 0l
-    var valuesCounter: Long=0l
-    val startedTime = now
-    var lastOutputTime = now
-    def timeSpentSinceStartInS = (now-startedTime)/1000
-    def timeSpentSinceLastOutput = {
-      val newLastOutputTime = now
-      val r = (newLastOutputTime-lastOutputTime)
-      lastOutputTime = newLastOutputTime
-      r
-    }
+  class DealerActor[NUM](handler: CheckedValue[NUM] => Unit) extends Actor {
+    val groupedAckSize = 500L
+    var valuesCounter: Long = 0l
     def receive = {
       case chk: CheckedValue[NUM] =>
-        import chk._
-        if (chk.isPrime) {
-          counter += 1
-          // take care with println usage to avoid mailbox congestion
-          if (counter % 10000L == 0L) {
-            println(s"$value is the $nth prime number. ${timeSpentSinceStartInS}s - ${timeSpentSinceLastOutput}ms")
-          }
-        }
-        valuesCounter+=1
-        if (valuesCounter%groupedAckSize == 0L) sender ! CheckedValueAckMessage(groupedAckSize) 
+        handler(chk)
+        valuesCounter += 1
+        if (valuesCounter % groupedAckSize == 0L) sender ! CheckedValueAckMessage(groupedAckSize)
     }
   }
 
-  private val printer = actor("ValuesPrinter") {
-    new PrinterActor
+  private val dealer = actor("DealerPrinter") {
+    new DealerActor(handler)
   }
 
   private val manager = actor("ValuesManagerActor") {
-    new ValuesManagerActor(printer)
+    new ValuesManagerActor(dealer)
   }
 
   def shutdown() {
     system.shutdown()
   }
 
+}
+
+
+
+
+object ActorsPrimesGenerator {
+  def mkPrintHandler[NUM]() : CheckedValue[NUM] => Unit = {
+    def now = System.currentTimeMillis()
+    var counter: Long = 0l
+    val startedTime = now
+    var lastOutputTime = now
+    def timeSpentSinceStartInS = (now - startedTime) / 1000
+    def timeSpentSinceLastOutput = {
+      val newLastOutputTime = now
+      val r = (newLastOutputTime - lastOutputTime)
+      lastOutputTime = newLastOutputTime
+      r
+    }
+    def handler(chk: CheckedValue[NUM]) {
+      import chk._
+      if (chk.isPrime) {
+        counter += 1
+        if (counter % 10000L == 0L) {
+          println(s"$value is the $nth prime number. ${timeSpentSinceStartInS}s - ${timeSpentSinceLastOutput}ms")
+        }
+      }
+    }
+    handler(_)
+  }
 }

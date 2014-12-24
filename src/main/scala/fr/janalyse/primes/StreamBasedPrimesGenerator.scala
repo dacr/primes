@@ -9,7 +9,8 @@ import scala.util.{ Failure, Success, Try }
 import akka.stream.scaladsl.FlowGraphImplicits
 
 class StreamBasedPrimesGenerator[NUM](
-  name: String = "DefaultPrimesGeneratorSystem",
+  handler: NUM => Unit,
+  name: String = "DefaultStreamBasedPrimesGeneratorSystem",
   startFrom: NUM = 2,
   primeNth: NUM = 1,
   notPrimeNth: NUM = 0)(implicit numops: Integral[NUM]) extends PrimesDefinitions[NUM] {
