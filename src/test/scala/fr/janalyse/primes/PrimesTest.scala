@@ -115,19 +115,23 @@ class PrimesTest extends FunSuite with ShouldMatchers {
     def handler(nv: CheckedValue[BigInt]) {
       perfTestSeriesLimits.headOption match {
         case Some(limit) =>
+          //println(s"${nv} - ${limit}")
           if (nv.isPrime) {
-            if (nv.nth >= limit)
-              info(s"duration for $limit : ${now - started}ms lastPrime=${nv.value}")
+            if (nv.nth >= limit) {
+              println(s"duration for $limit : ${now - started}ms lastPrime=${nv.value}")
+              perfTestSeriesLimits = perfTestSeriesLimits.tail
+            }
           }
         case None =>
           // Stop the test
-          finished.success(true)
+          if (!finished.isCompleted) finished.success(true)
       }
     }
     val gen = new ActorsPrimesGenerator[BigInt](handler(_))
     
     Await.result(finished.future, 60.seconds)
-    
+    //Thread.sleep(60000L)
+    gen.shutdown
   }
 
 }
