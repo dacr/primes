@@ -109,28 +109,36 @@ class PrimesTest extends FunSuite with ShouldMatchers {
   }
 
   test("actors based computation test - BigInt") {
+    import scala.concurrent.ExecutionContext.Implicits.global
     val started = now
-    var perfTestSeriesLimits = perfTestSeries.map(n => BigInt(n))
-    val finished = Promise[Boolean]()
-    def handler(nv: CheckedValue[BigInt]) {
-      perfTestSeriesLimits.headOption match {
-        case Some(limit) =>
-          //println(s"${nv} - ${limit}")
-          if (nv.isPrime) {
-            if (nv.nth >= limit) {
-              println(s"duration for $limit : ${now - started}ms lastPrime=${nv.value}")
-              perfTestSeriesLimits = perfTestSeriesLimits.tail
-            }
+    val results = Promise[List[String]]()
+    val handler = {
+      var perfTestSeriesLimits = perfTestSeries.map(n => BigInt(n))
+      var infos = List.empty[String]
+      (nv: CheckedValue[BigInt]) =>
+        {
+          perfTestSeriesLimits.headOption match {
+            case Some(limit) =>
+              if (nv.isPrime) {
+                if (nv.nth >= limit) {
+                  infos ::= s"duration for $limit : ${now - started}ms lastPrime=${nv.value}"
+                  perfTestSeriesLimits = perfTestSeriesLimits.tail
+                }
+              }
+            case None =>
+              // Stop the test
+              if (!results.isCompleted) results.success(infos.reverse)
           }
-        case None =>
-          // Stop the test
-          if (!finished.isCompleted) finished.success(true)
-      }
+        }
     }
     val gen = new ActorsPrimesGenerator[BigInt](handler(_))
+
+    for {
+      msgs <- results.future
+      msg <- msgs
+    } info(msg)
     
-    Await.result(finished.future, 60.seconds)
-    //Thread.sleep(60000L)
+    Await.result(results.future, 60.seconds)
     gen.shutdown
   }
 
