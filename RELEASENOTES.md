@@ -4,5 +4,7 @@ Release 1.1.0
   - scalatest 2.2.+
   - akka stream 1.0M2
   - StreamBasedPrimesGenerator algorithm added (refactoring required, not really finished)
-    Akka stream based primes computation with automatic back pressure managed.
-    => very fast !! 
+    => Akka stream based primes computation with automatic back pressure managed.
+    => But in this implementation the output order is not preserved...
+  - ActorsPrimesGenerator algorithm
+    => Here the order is preserved

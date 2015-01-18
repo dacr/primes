@@ -11,7 +11,7 @@ class ActorsPrimesGenerator[NUM](
   name: String = "DefaultActordBasedPrimesGeneratorSystem",
   startFrom: NUM = 2,
   primeNth: NUM = 1,
-  notPrimeNth: NUM = 0)(implicit numops: Integral[NUM]) extends PrimesDefinitions[NUM] {
+  notPrimeNth: NUM = 1)(implicit numops: Integral[NUM]) extends PrimesDefinitions[NUM] with Shutdownable {
   import numops._
 
   val config = ConfigFactory.load()
@@ -124,7 +124,7 @@ class ActorsPrimesGenerator[NUM](
     new ValuesManagerActor(dealer)
   }
 
-  def shutdown() {
+  override def shutdown() {
     system.shutdown()
   }
 

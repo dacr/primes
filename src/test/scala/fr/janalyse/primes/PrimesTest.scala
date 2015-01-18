@@ -109,7 +109,10 @@ class PrimesTest extends FunSuite with ShouldMatchers {
   }
 
   
-  test("akka actors based computation test - BigInt") {
+  
+  
+  def genericActorsTest[CL <% Shutdownable]
+       (genfact: (CheckedValue[BigInt]=>Unit) => CL) = {
     import scala.concurrent.ExecutionContext.Implicits.global
     val started = now
     val results = Promise[List[String]]()
@@ -132,50 +135,29 @@ class PrimesTest extends FunSuite with ShouldMatchers {
           }
         }
     }
-    val gen = new ActorsPrimesGenerator[BigInt](handler(_))
+    val gen = genfact(handler(_))
 
-    for {
-      msgs <- results.future
-      msg <- msgs
-    } info(msg)
+//    for {
+//      msgs <- results.future
+//      msg <- msgs
+//    } info(msg)
+//    
+//    Await.result(results.future, 60.seconds)
     
-    Await.result(results.future, 60.seconds)
+    val r = Await.result(results.future, 60.seconds)
+    for {msg <- r} info(msg) // Executed in the current thread is better for scalatest
+    
     gen.shutdown
   }
-
-  
-  test("akka streams based computation test - BigInt") {
-   import scala.concurrent.ExecutionContext.Implicits.global
-    val started = now
-    val results = Promise[List[String]]()
-    val handler = {
-      var perfTestSeriesLimits = perfTestSeries.map(n => BigInt(n))
-      var infos = List.empty[String]
-      (nv: CheckedValue[BigInt]) =>
-        {
-          perfTestSeriesLimits.headOption match {
-            case Some(limit) =>
-              if (nv.isPrime) {
-                if (nv.nth >= limit) {
-                  infos ::= s"duration for $limit : ${now - started}ms lastPrime=${nv.value}"
-                  perfTestSeriesLimits = perfTestSeriesLimits.tail
-                }
-              }
-            case None =>
-              // Stop the test
-              if (!results.isCompleted) results.success(infos.reverse)
-          }
-        }
-    }
-    val gen = new StreamBasedPrimesGenerator[BigInt](handler(_))
-
-    for {
-      msgs <- results.future
-      msg <- msgs
-    } info(msg)
-    
-    Await.result(results.future, 60.seconds)
-    gen.shutdown
+   
+  test("akka actors based computation test - BigInt") {
+    genericActorsTest(handler => new ActorsPrimesGenerator[BigInt](handler))
   }
   
+  test("akka actors streams based computation test - BigInt") {
+    genericActorsTest(handler => new StreamBasedPrimesGenerator[BigInt](handler))
+    info("Remember that the order is not preserved...")
+    info("the behavior is a little kind different than with PrimesGenerator")
+  }
+ 
 }

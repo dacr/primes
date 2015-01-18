@@ -11,17 +11,15 @@ import akka.stream.scaladsl._
 
 class NumericIterator[NUM](startFrom:NUM)(implicit numops: Integral[NUM]) extends Iterator[NUM] {
   import numops._
-  private var num: NUM = startFrom
+  private var num: NUM = startFrom - one
   override def next(): NUM = {
-    val ret = num
-    num = num + one
+    num += one
     num
   }
   override def hasNext(): Boolean = true
 }
 
 object StreamBasedPrimesGenerator {
-
   def now=System.currentTimeMillis()
   def defaultHandlerFactory[NUM]():CheckedValue[NUM]=>Unit = {
     val started=now
@@ -30,7 +28,6 @@ object StreamBasedPrimesGenerator {
     }
     followperf
   }
-
 }
 
 class StreamBasedPrimesGenerator[NUM](
@@ -38,7 +35,7 @@ class StreamBasedPrimesGenerator[NUM](
   name: String = "DefaultStreamBasedPrimesGeneratorSystem",
   startFrom: NUM = 2,
   primeNth: NUM = 1,
-  notPrimeNth: NUM = 0)(implicit numops: Integral[NUM]) extends PrimesDefinitions[NUM] {
+  notPrimeNth: NUM = 1)(implicit numops: Integral[NUM]) extends PrimesDefinitions[NUM] with Shutdownable {
   import numops._
 
   implicit val system = ActorSystem(name)
@@ -67,14 +64,14 @@ class StreamBasedPrimesGenerator[NUM](
     }
     val onlyPrimes = Flow[TestedValue].filter(_.state)
     val onlyNotPrimes = Flow[TestedValue].filter(! _.state)
-   
+
     val out = ForeachSink[CheckedValue[NUM]](handler)
-    
-    val cast = Broadcast[TestedValue] // the splitter - like a Unix tee
+
+    val cast = Broadcast[TestedValue]
     val merge = Merge[CheckedValue[NUM]]
     val zipPrimeNth = Zip[NUM, TestedValue]
     val zipNotPrimeNth= Zip[NUM, TestedValue]
-   
+
     isPrimeNth ~> zipPrimeNth.left
     isNotPrimeNth ~> zipNotPrimeNth.left
 
@@ -83,9 +80,8 @@ class StreamBasedPrimesGenerator[NUM](
                                                     zipPrimeNth.out    ~> checkedValues ~> merge
                                                     zipNotPrimeNth.out ~> checkedValues ~> merge
                                                                                            merge ~> out
-   
   }.run()
 
-  def shutdown() { system.shutdown()}
+  override def shutdown() { system.shutdown()}
 }
 
