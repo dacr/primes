@@ -11,4 +11,7 @@ object CheckedValue {
     import numops._
     CheckedValue(one + one, true, 1, one)
   }
+  def apply[NUM](value: NUM, isPrime:Boolean, nth:NUM)(implicit numops: Integral[NUM]): CheckedValue[NUM] = {
+    CheckedValue(value, isPrime, value.toString.size, nth)
+  }
 }

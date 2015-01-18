@@ -70,17 +70,18 @@ class PrimesTest extends FunSuite with ShouldMatchers {
     resumed.filterNot(_.isPrime).map(_.nth) should equal(List(6, 7, 8, 9, 10, 11))
   }
 
+  test("factorize tests") {
+    val pgen = new PrimesGenerator[BigInt]
+    pgen.factorize(9, pgen.primes.toIterator) should equal(Some(List(3, 3)))
+    pgen.factorize(1236, pgen.primes.toIterator) should equal(Some(List(103, 3, 2, 2)))
+    pgen.factorize(1237, pgen.primes.toIterator) should equal(Some(Nil))
+    pgen.factorize(923412, pgen.primes.take(10).toIterator) should equal(None)
+  }
+
   val perfTestSeries = List(10000, 25000, 50000)
 
   test("Performance classic tests - Long") {
     val pgen = new PrimesGenerator[Long]
-    import pgen._
-    for (sz <- perfTestSeries)
-      howlongfor(sz, primes.drop(_).head)("lastPrime=" + _.toString)
-  }
-
-  test("Performance classic tests - BigInt") {
-    val pgen = new PrimesGenerator[BigInt]
     import pgen._
     for (sz <- perfTestSeries)
       howlongfor(sz, primes.drop(_).head)("lastPrime=" + _.toString)
@@ -93,6 +94,13 @@ class PrimesTest extends FunSuite with ShouldMatchers {
       howlongfor(sz, primesPar.drop(_).head)("lastPrime=" + _.toString)
   }
 
+  test("Performance classic tests - BigInt") {
+    val pgen = new PrimesGenerator[BigInt]
+    import pgen._
+    for (sz <- perfTestSeries)
+      howlongfor(sz, primes.drop(_).head)("lastPrime=" + _.toString)
+  }
+
   test("Performance parallel tests - BigInt") {
     val pgen = new PrimesGenerator[BigInt]
     import pgen._
@@ -100,15 +108,8 @@ class PrimesTest extends FunSuite with ShouldMatchers {
       howlongfor(sz, primesPar.drop(_).head)("lastPrime=" + _.toString)
   }
 
-  test("factorize tests") {
-    val pgen = new PrimesGenerator[BigInt]
-    pgen.factorize(9, pgen.primes.toIterator) should equal(Some(List(3, 3)))
-    pgen.factorize(1236, pgen.primes.toIterator) should equal(Some(List(103, 3, 2, 2)))
-    pgen.factorize(1237, pgen.primes.toIterator) should equal(Some(Nil))
-    pgen.factorize(923412, pgen.primes.take(10).toIterator) should equal(None)
-  }
-
-  test("actors based computation test - BigInt") {
+  
+  test("akka actors based computation test - BigInt") {
     import scala.concurrent.ExecutionContext.Implicits.global
     val started = now
     val results = Promise[List[String]]()
@@ -142,4 +143,39 @@ class PrimesTest extends FunSuite with ShouldMatchers {
     gen.shutdown
   }
 
+  
+  test("akka streams based computation test - BigInt") {
+   import scala.concurrent.ExecutionContext.Implicits.global
+    val started = now
+    val results = Promise[List[String]]()
+    val handler = {
+      var perfTestSeriesLimits = perfTestSeries.map(n => BigInt(n))
+      var infos = List.empty[String]
+      (nv: CheckedValue[BigInt]) =>
+        {
+          perfTestSeriesLimits.headOption match {
+            case Some(limit) =>
+              if (nv.isPrime) {
+                if (nv.nth >= limit) {
+                  infos ::= s"duration for $limit : ${now - started}ms lastPrime=${nv.value}"
+                  perfTestSeriesLimits = perfTestSeriesLimits.tail
+                }
+              }
+            case None =>
+              // Stop the test
+              if (!results.isCompleted) results.success(infos.reverse)
+          }
+        }
+    }
+    val gen = new StreamBasedPrimesGenerator[BigInt](handler(_))
+
+    for {
+      msgs <- results.future
+      msg <- msgs
+    } info(msg)
+    
+    Await.result(results.future, 60.seconds)
+    gen.shutdown
+  }
+  
 }
