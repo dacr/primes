@@ -14,6 +14,17 @@ class ActorsPrimesGenerator[NUM](
   notPrimeNth: NUM = 1)(implicit numops: Integral[NUM]) extends PrimesDefinitions[NUM] with Shutdownable {
   import numops._
 
+  /*
+   * To minimize the amount of messages used for back pressure regulation
+   */
+  val groupedAckSize = 100L
+  
+  /*
+   * How many values to keep precomputed but not yet sent to the receiver
+   */
+  val precomputedCount = 150L
+
+  
   val config = ConfigFactory.load()
   implicit val system = ActorSystem(name, config.getConfig("primes").withFallback(config))
 
@@ -39,7 +50,6 @@ class ActorsPrimesGenerator[NUM](
 
   class ValuesManagerActor(
     forActor: ActorRef,
-    precomputedCount: Int = 30000,
     checkerWorkers: Int = Runtime.getRuntime.availableProcessors) extends Actor {
     val checkerRouter = context.actorOf(
       CheckerActor.props.withRouter(SmallestMailboxPool(checkerWorkers)),
@@ -75,7 +85,7 @@ class ActorsPrimesGenerator[NUM](
     }
 
     private def prepareNexts() {
-      if (sentAckDelta < 20000) {
+      if (sentAckDelta <= groupedAckSize) {
         for { _ <- inpg to precomputedCount } {
           checkerRouter ! NextValue(nextValue)
           nextValue += one
@@ -106,7 +116,6 @@ class ActorsPrimesGenerator[NUM](
   }
 
   class DealerActor[NUM](handler: CheckedValue[NUM] => Unit) extends Actor {
-    val groupedAckSize = 500L
     var valuesCounter: Long = 0l
     def receive = {
       case chk: CheckedValue[NUM] =>

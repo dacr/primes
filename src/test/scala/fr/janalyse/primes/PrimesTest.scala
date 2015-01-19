@@ -10,27 +10,9 @@ import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.ShouldMatchers
 import org.scalatest.junit.JUnitRunner
-import java.lang.management.ManagementFactory
-import scala.concurrent._
-import scala.concurrent.duration._
 
 @RunWith(classOf[JUnitRunner])
-class PrimesTest extends FunSuite with ShouldMatchers {
-
-  val cpuCount = java.lang.Runtime.getRuntime.availableProcessors
-  def now = System.currentTimeMillis
-  val os = ManagementFactory.getOperatingSystemMXBean()
-  def lastMinuteCpuAverage() = (os.getSystemLoadAverage() * 100).toInt
-
-  def howlongfor[T](param: Int, proc: Int => T)(infoOnResult: T => String): T = {
-    now match {
-      case start =>
-        val result = proc(param)
-        //val cpu = lastMinuteCpuAverage() // cpu=${cpu}%
-        info(s"duration for $param : ${now - start}ms ${infoOnResult(result)}")
-        result
-    }
-  }
+class PrimesTest extends PrimesTestCommons {
 
   test("Simple tests") {
     val pgen = new PrimesGenerator[Long]
@@ -78,8 +60,6 @@ class PrimesTest extends FunSuite with ShouldMatchers {
     pgen.factorize(923412, pgen.primes.take(10).toIterator) should equal(None)
   }
 
-  val perfTestSeries = List(10000, 25000, 50000)
-
   test("Performance classic tests - Long") {
     val pgen = new PrimesGenerator[Long]
     import pgen._
@@ -108,56 +88,4 @@ class PrimesTest extends FunSuite with ShouldMatchers {
       howlongfor(sz, primesPar.drop(_).head)("lastPrime=" + _.toString)
   }
 
-  
-  
-  
-  def genericActorsTest[CL <% Shutdownable]
-       (genfact: (CheckedValue[BigInt]=>Unit) => CL) = {
-    import scala.concurrent.ExecutionContext.Implicits.global
-    val started = now
-    val results = Promise[List[String]]()
-    val handler = {
-      var perfTestSeriesLimits = perfTestSeries.map(n => BigInt(n))
-      var infos = List.empty[String]
-      (nv: CheckedValue[BigInt]) =>
-        {
-          perfTestSeriesLimits.headOption match {
-            case Some(limit) =>
-              if (nv.isPrime) {
-                if (nv.nth >= limit) {
-                  infos ::= s"duration for $limit : ${now - started}ms lastPrime=${nv.value}"
-                  perfTestSeriesLimits = perfTestSeriesLimits.tail
-                }
-              }
-            case None =>
-              // Stop the test
-              if (!results.isCompleted) results.success(infos.reverse)
-          }
-        }
-    }
-    val gen = genfact(handler(_))
-
-//    for {
-//      msgs <- results.future
-//      msg <- msgs
-//    } info(msg)
-//    
-//    Await.result(results.future, 60.seconds)
-    
-    val r = Await.result(results.future, 60.seconds)
-    for {msg <- r} info(msg) // Executed in the current thread is better for scalatest
-    
-    gen.shutdown
-  }
-   
-  test("akka actors based computation test - BigInt") {
-    genericActorsTest(handler => new ActorsPrimesGenerator[BigInt](handler))
-  }
-  
-  test("akka actors streams based computation test - BigInt") {
-    genericActorsTest(handler => new StreamBasedPrimesGenerator[BigInt](handler))
-    info("Remember that the order is not preserved...")
-    info("the behavior is a little kind different than with PrimesGenerator")
-  }
- 
 }
