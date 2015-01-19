@@ -4,13 +4,16 @@ seq(assemblySettings: _*)
 
 name := "primes"
 
-version := "1.1.0"
+version := "1.2.0"
 
 organization :="fr.janalyse"
 
 organizationHomepage := Some(new URL("http://www.janalyse.fr"))
 
 scalaVersion := "2.11.4"
+
+// Mandatory as tests are also used for performances testing...
+parallelExecution in Test := false
 
 scalacOptions ++= Seq( "-deprecation", "-unchecked", "-feature")
 

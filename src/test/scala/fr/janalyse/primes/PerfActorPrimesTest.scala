@@ -13,7 +13,7 @@ import scala.concurrent._
 import scala.concurrent.duration._
 
 @RunWith(classOf[JUnitRunner])
-class ActorPrimesTest extends PrimesTestCommons {
+class PerfActorPrimesTest extends PrimesTestCommons {
 
   test("akka actors based computation test - BigInt") {
     genericActorsTest(handler => new ActorsPrimesGenerator[BigInt](handler))
