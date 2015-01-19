@@ -38,7 +38,7 @@ trait PrimesTestCommons  extends FunSuite with ShouldMatchers {
           perfTestSeriesLimits.headOption match {
             case Some(limit) =>
               if (nv.isPrime) {
-                if (nv.nth >= limit) {
+                if (nv.nth > limit) {
                   infos ::= s"duration for $limit : ${now - started}ms lastPrime=${nv.value}"
                   perfTestSeriesLimits = perfTestSeriesLimits.tail
                 }
