@@ -60,7 +60,6 @@ class StreamBasedPrimesGenerator[NUM](
     val isNotPrimeNthIterator = new NumericIterator(notPrimeNth)
     val isNotPrimeNth = Source(() => isNotPrimeNthIterator)
 
-    //val testedValues = Flow[NUM].mapAsyncUnordered(x=> Future{TestedValue(x) })
     val testedValues = Flow[NUM].mapAsync(x=> Future{TestedValue(x) })
     
     val checkedValues = Flow[(NUM, TestedValue)].map {
