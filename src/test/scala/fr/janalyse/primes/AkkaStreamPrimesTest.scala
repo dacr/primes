@@ -27,7 +27,7 @@ class AkkaStreamPrimesTest extends PrimesTestCommons {
     }
     val sgen = new StreamBasedPrimesGenerator[Long](handler)
     
-    // Return back in the current thread 
+    // back in the current thread 
     val result = Await.result(primePromise.future, 2.minutes)
     val ellapsed = now-started
     info(s"Found $result in ${ellapsed}ms") // Executed in the current thread is better for scalatest to avoid formatting issues
