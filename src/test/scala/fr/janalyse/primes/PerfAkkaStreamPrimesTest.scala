@@ -17,7 +17,7 @@ class PerfAkkaStreamPrimesTest extends PrimesTestCommons {
 
   test("akka actors streams based computation test - BigInt") {
     genericActorsTest(handler => new StreamBasedPrimesGenerator[BigInt](handler))
-    info("Remember that the order is not preserved...")
+    info("The order is preserved, with back-pressure control and the whole without any effort !")
     info("the behavior is a little kind different than with PrimesGenerator")
   }
  

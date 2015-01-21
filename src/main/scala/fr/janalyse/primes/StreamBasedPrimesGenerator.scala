@@ -5,6 +5,7 @@ import akka.stream.FlowMaterializer
 import akka.stream.scaladsl.{ Broadcast, FlowGraph, ForeachSink, Source }
 
 import scala.concurrent.forkjoin.ThreadLocalRandom
+import scala.concurrent.Future
 import scala.util.{ Failure, Success, Try }
 import akka.stream.scaladsl.FlowGraphImplicits
 import akka.stream.scaladsl._
@@ -44,6 +45,7 @@ class StreamBasedPrimesGenerator[NUM](
   
   case class TestedValue(value:NUM) {
     val state = isPrime(value)
+    val digitCount = value.toString.size
   }
   
   val materialized = FlowGraph { implicit builder =>
@@ -58,9 +60,11 @@ class StreamBasedPrimesGenerator[NUM](
     val isNotPrimeNthIterator = new NumericIterator(notPrimeNth)
     val isNotPrimeNth = Source(() => isNotPrimeNthIterator)
 
-    val testedValues = Flow[NUM].map(TestedValue)
+    //val testedValues = Flow[NUM].mapAsyncUnordered(x=> Future{TestedValue(x) })
+    val testedValues = Flow[NUM].mapAsync(x=> Future{TestedValue(x) })
+    
     val checkedValues = Flow[(NUM, TestedValue)].map {
-      case (nth, tv) => CheckedValue[NUM](tv.value, tv.state, nth)
+      case (nth, tv) => CheckedValue[NUM](tv.value, tv.state, tv.digitCount, nth)
     }
     val onlyPrimes = Flow[TestedValue].filter(_.state)
     val onlyNotPrimes = Flow[TestedValue].filter(! _.state)
