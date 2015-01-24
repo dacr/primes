@@ -1,4 +1,9 @@
-Release 1.1.0
+Release 1.2.1
+  - scala 2.11.5
+  - akka 2.3.9
+  - paul philipps "sbt" launcher script added 
+
+Release 1.2.0
   - scala 2.11.4
   - akka 2.3.8
   - scalatest 2.2.+

@@ -4,20 +4,20 @@ seq(assemblySettings: _*)
 
 name := "primes"
 
-version := "1.2.0"
+version := "1.2.1"
 
 organization :="fr.janalyse"
 
 organizationHomepage := Some(new URL("http://www.janalyse.fr"))
 
-scalaVersion := "2.11.4"
+scalaVersion := "2.11.5"
 
 // Mandatory as tests are also used for performances testing...
 parallelExecution in Test := false
 
 scalacOptions ++= Seq( "-deprecation", "-unchecked", "-feature")
 
-crossScalaVersions := Seq("2.10.4", "2.11.4")
+crossScalaVersions := Seq("2.10.4", "2.11.5")
 
 mainClass in assembly := Some("fr.janalyse.primes.Main")
 
@@ -28,7 +28,7 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.+" % "test"
 libraryDependencies += "junit" % "junit" % "4.+" % "test"
 
 libraryDependencies ++= Seq(
-   "com.typesafe.akka" %% "akka-actor" % "2.3.8",
+   "com.typesafe.akka" %% "akka-actor" % "2.3.9",
    "com.typesafe.akka" %% "akka-stream-experimental" % "1.0-M2"
 )
 
