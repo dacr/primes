@@ -15,8 +15,8 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
   protected val four = two + two
   protected val five = four + one
   protected val six = three + three
-  protected val seven = four+three
-  protected val eight = four+four
+  protected val seven = four + three
+  protected val eight = four + four
   protected val nine = five + four
   protected val ten = five + five
 
@@ -57,6 +57,23 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
     (v <= three) || checkUpTo(two)
   }
 
+  private class EratosthenesCell(val value: NUM) {
+    private var pstate = Option.empty[Boolean]
+    def unprime() { pstate = Some(false) }
+    def prime() { pstate = Some(true) }
+    def isPrime() = pstate
+  }
+
+  def eratosthenesSieve(v: NUM): List[NUM] = {
+    val upTo = sqrt(v)
+    @tailrec
+    def buildSieve(it: NumericReverseIterator[NUM], cur: List[EratosthenesCell] = Nil): List[EratosthenesCell] =
+      if (it.hasNext) buildSieve(it, new EratosthenesCell(it.next) :: cur) else cur
+    val sieve = buildSieve(new NumericReverseIterator[NUM](v, _ >= two))
+    
+    List.empty
+  }
+
   def isMersennePrimeExponent(v: NUM, primeTest: NUM => Boolean = isPrime): Boolean =
     primeTest(v) && primeTest(pow(two, v) - one)
 
@@ -91,12 +108,11 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
     factit(value, prime4start, Nil)
   }
 
-  
-//  def sacksSpiral(size:Int, values: => Iterator[CheckedValue[NUM]], len:Int): BufferedImage = {
+  //  def sacksSpiral(size:Int, values: => Iterator[CheckedValue[NUM]], len:Int): BufferedImage = {
 
-//  }
+  //  }
 
-  private def spiral(size: Int, draw: (Graphics2D, Int,Int,Int)=>Unit): BufferedImage = {
+  private def spiral(size: Int, draw: (Graphics2D, Int, Int, Int) => Unit): BufferedImage = {
     val width = size
     val height = size
     val xc = width / 2
@@ -107,36 +123,32 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
     gr.clearRect(0, 0, width, height)
     gr.setColor(Color.WHITE)
 
-
     @tailrec
-    def spiral(x: Int, y: Int, sz: Int, remain: Int, len:Int) {
+    def spiral(x: Int, y: Int, sz: Int, remain: Int, len: Int) {
       draw(gr, x, y, len)
-      for { i <- 1 to sz } draw(gr, x, y + i,len+1) // DOWN
-      for { i <- 1 to sz } draw(gr, x - i, y + sz, len+2) // LEFT
-      for { i <- 1 to sz + 1 } draw(gr, x - sz, y + sz - i, len+3) // UP
-      for { i <- 1 to sz } draw(gr, x - sz + i, y - 1, len+4) // RIGHT
-      if (remain > 0) spiral(x + 1, y - 1, sz + 2, remain - 2 * sz - 2 * (sz - 1), len+5)
+      for { i <- 1 to sz } draw(gr, x, y + i, len + 1) // DOWN
+      for { i <- 1 to sz } draw(gr, x - i, y + sz, len + 2) // LEFT
+      for { i <- 1 to sz + 1 } draw(gr, x - sz, y + sz - i, len + 3) // UP
+      for { i <- 1 to sz } draw(gr, x - sz + i, y - 1, len + 4) // RIGHT
+      if (remain > 0) spiral(x + 1, y - 1, sz + 2, remain - 2 * sz - 2 * (sz - 1), len + 5)
     }
 
     spiral(xc, yc, 1, width * height, 0)
     gr.setColor(Color.RED)
     gr.drawRect(xc, yc, 0, 0)
     bi
-  }  
-  
-  
-  
+  }
+
   def ulamSpiral(size: Int, values: Iterator[CheckedValue[NUM]]): BufferedImage = {
-    def draw(gr:Graphics2D, x: Int, y: Int, len:Int) {
+    def draw(gr: Graphics2D, x: Int, y: Int, len: Int) {
       if (values.hasNext && values.next.isPrime) gr.drawRect(x, y, 0, 0)
     }
     spiral(size, draw)
   }
 
-  
-  def sacksInspiredSpiral(size: Int, interval:Int, values: Iterator[CheckedValue[NUM]]): BufferedImage = {
-    def draw(gr:Graphics2D, x: Int, y: Int, len:Int) {
-      if (values.hasNext && (len%interval==0) && values.next.isPrime) gr.drawRect(x, y, 0, 0)
+  def sacksInspiredSpiral(size: Int, interval: Int, values: Iterator[CheckedValue[NUM]]): BufferedImage = {
+    def draw(gr: Graphics2D, x: Int, y: Int, len: Int) {
+      if (values.hasNext && (len % interval == 0) && values.next.isPrime) gr.drawRect(x, y, 0, 0)
     }
     spiral(size, draw)
   }

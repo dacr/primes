@@ -2,6 +2,7 @@ Release 1.2.1
   - scala 2.11.5
   - akka 2.3.9
   - paul philipps "sbt" launcher script added 
+  - Sieve of Eratosthenes algorithm added
 
 Release 1.2.0
   - scala 2.11.4
