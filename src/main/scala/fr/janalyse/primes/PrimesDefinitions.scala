@@ -58,20 +58,44 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
   }
 
   private class EratosthenesCell(val value: NUM) {
-    private var pstate = Option.empty[Boolean]
-    def unprime() { pstate = Some(false) }
-    def prime() { pstate = Some(true) }
-    def isPrime() = pstate
+    private var marked = false
+    def mark() { marked = true }
+    def isMarked = marked
+    def isPrime() = marked == false // true for primes only once the sieve of eratosthenes is finished
   }
 
-  def eratosthenesSieve(v: NUM): List[NUM] = {
+  def eratosthenesSieve(v: NUM): List[CheckedValue[NUM]] = {
     val upTo = sqrt(v)
     @tailrec
     def buildSieve(it: NumericReverseIterator[NUM], cur: List[EratosthenesCell] = Nil): List[EratosthenesCell] =
       if (it.hasNext) buildSieve(it, new EratosthenesCell(it.next) :: cur) else cur
+    @tailrec
+    def mark(multiples: Stream[NUM], cur: List[EratosthenesCell]) {
+        cur.headOption match {
+          case None =>
+          case _ if multiples.head >v =>
+          case Some(cell) if cell.value == multiples.head => 
+            cell.mark()
+            mark(multiples.tail, cur.tail)
+          case Some(cell) =>
+            mark(multiples, cur.tail)
+        }
+    }
+    @tailrec
+    def worker(cur: List[EratosthenesCell]) {
+      if (!cur.isEmpty && cur.head.value <= upTo) {
+        if (!cur.head.isMarked) worker(cur.tail)
+        else mark(new NumericIterator[NUM](two).toStream.map(_ * cur.head.value), cur.tail)
+      }
+    }
     val sieve = buildSieve(new NumericReverseIterator[NUM](v, _ >= two))
-    
-    List.empty
+    worker(sieve)
+    var nthIsPrime = zero
+    var nthIsNotPrime = zero
+    def computeNth(isp: Boolean): NUM = {
+      if (isp) { nthIsPrime += one; nthIsPrime } else { nthIsNotPrime += one; nthIsNotPrime }
+    }
+    sieve.map(ec => CheckedValue(ec.value, ec.isPrime(), computeNth(ec.isPrime())))
   }
 
   def isMersennePrimeExponent(v: NUM, primeTest: NUM => Boolean = isPrime): Boolean =
