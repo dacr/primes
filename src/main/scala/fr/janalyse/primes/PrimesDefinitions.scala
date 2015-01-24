@@ -62,8 +62,12 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
     def mark() { marked = true }
     def isMarked = marked
     def isPrime() = marked == false // true for primes only once the sieve of eratosthenes is finished
+    override def toString() = s"ECell($value, $marked)"
   }
-
+  
+  /**
+   *
+   */
   def eratosthenesSieve(v: NUM): List[CheckedValue[NUM]] = {
     val upTo = sqrt(v)
     @tailrec
@@ -71,24 +75,26 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
       if (it.hasNext) buildSieve(it, new EratosthenesCell(it.next) :: cur) else cur
     @tailrec
     def mark(multiples: Stream[NUM], cur: List[EratosthenesCell]) {
-        cur.headOption match {
-          case None =>
-          case _ if multiples.head >v =>
-          case Some(cell) if cell.value == multiples.head => 
-            cell.mark()
-            mark(multiples.tail, cur.tail)
-          case Some(cell) =>
-            mark(multiples, cur.tail)
-        }
+      cur.headOption match {
+        case None                    =>
+        case _ if multiples.head > v =>
+        case Some(cell) if cell.value == multiples.head =>
+          cell.mark()
+          mark(multiples.tail, cur.tail)
+        case Some(cell) =>
+          mark(multiples, cur.tail)
+      }
     }
     @tailrec
     def worker(cur: List[EratosthenesCell]) {
-      if (!cur.isEmpty && cur.head.value <= upTo) {
-        if (!cur.head.isMarked) worker(cur.tail)
-        else mark(new NumericIterator[NUM](two).toStream.map(_ * cur.head.value), cur.tail)
+      if (!cur.isEmpty && cur.head.value <=upTo) {
+        if (!cur.head.isMarked) {
+          mark(new NumericIterator[NUM](two).toStream.map(_ * cur.head.value), cur.tail)
+        }
+        worker(cur.tail)
       }
     }
-    val sieve = buildSieve(new NumericReverseIterator[NUM](v, _ >= two))
+    val sieve = buildSieve(new NumericReverseIterator[NUM](v, _ > two))
     worker(sieve)
     var nthIsPrime = zero
     var nthIsNotPrime = zero
@@ -98,6 +104,9 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
     sieve.map(ec => CheckedValue(ec.value, ec.isPrime(), computeNth(ec.isPrime())))
   }
 
+  /**
+   *
+   */
   def isMersennePrimeExponent(v: NUM, primeTest: NUM => Boolean = isPrime): Boolean =
     primeTest(v) && primeTest(pow(two, v) - one)
 

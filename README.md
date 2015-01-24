@@ -69,7 +69,14 @@ CheckedValue(104831,true,10010)
 scala> mersennePrimes.take(8).toList
 res6: List[Long] = List(3, 7, 31, 127, 8191, 131071, 524287, 2147483647)
   (for mersenne primes, switch to BigInt...)
+
+scala> val dp = new PrimesDefinitions[BigInt]()
+scala> dp.eratosthenesSieve(100).last
+res0: fr.janalyse.primes.CheckedValue[BigInt] = CheckedValue(100,false,3,74)
+
+
   
 ```
+
 
 and so one...
