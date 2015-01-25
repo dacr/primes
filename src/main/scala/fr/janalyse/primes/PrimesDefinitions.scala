@@ -10,34 +10,34 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
 
   import numops._
 
-  protected val two = one + one
-  protected val three = two + one
-  protected val four = two + two
-  protected val five = four + one
-  protected val six = three + three
-  protected val seven = four + three
-  protected val eight = four + four
-  protected val nine = five + four
-  protected val ten = five + five
-
-  def pow(n: NUM, p: NUM): NUM = {
-    @tailrec
-    def powit(cur: NUM, r: NUM): NUM = {
-      if (r == one) cur else powit(cur * n, r - one)
-    }
-    if (p < zero) sys.error("Not supported")
-    if (p == zero) one else powit(n, p)
+  protected final val two = one + one
+  protected final val three = two + one
+  protected final val four = two + two
+  protected final val five = four + one
+  protected final val six = three + three
+  protected final val seven = four + three
+  protected final val eight = four + four
+  protected final val nine = five + four
+  protected final val ten = five + five
+  
+  @tailrec
+  private final def powit(n: NUM, cur: NUM, r: NUM): NUM = {
+    if (r == one) cur else powit(n, cur * n, r - one)
   }
 
-  def sqrt(number: NUM) = { //https://issues.scala-lang.org/browse/SI-3739
-    def next(n: NUM, i: NUM): NUM = (n + i / n) / two
+  final def pow(n: NUM, p: NUM): NUM = {
+    if (p < zero) sys.error("Not supported")
+    if (p == zero) one else powit(n, n, p)
+  }
 
+  private final def sqrtNext(n: NUM, i: NUM): NUM = (n + i / n) / two
+  final def sqrt(number: NUM) = { //https://issues.scala-lang.org/browse/SI-3739
     var n = one
-    var n1 = next(n, number)
+    var n1 = sqrtNext(n, number)
 
     while ((n1 - n).abs > one) {
       n = n1
-      n1 = next(n, number)
+      n1 = sqrtNext(n, number)
     }
 
     while (n1 * n1 > number) {
@@ -47,16 +47,49 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
     n1
   }
 
-  def isPrime(v: NUM): Boolean = {
+  @tailrec
+  private final def checkUpTo(v: NUM, from: NUM, upTo: NUM): Boolean = {
+    if (v % from == 0) false
+    else if (from == upTo) true else checkUpTo(v, from + one, upTo)
+  }
+  final def isPrime(v: NUM): Boolean = {
     val upTo = sqrt(v)
+    (v <= three) || checkUpTo(v, two, upTo)
+  }
+  
+  /**
+   *
+   */
+  def isPrimePara(v:NUM, cores:Int = java.lang.Runtime.getRuntime.availableProcessors):Boolean = {
+    import scala.concurrent._
+    import scala.concurrent.duration._
+    import scala.concurrent.ExecutionContext.Implicits.global
+    import scala.util._
+    val result = Promise[Boolean]
     @tailrec
-    def checkUpTo(from: NUM): Boolean = {
-      if (v % from == 0) false
-      else if (from == upTo) true else checkUpTo(from + one)
+    def checkUpToPara(v: NUM, from: NUM, to: NUM) {
+      if (v % from == 0) result.complete(Success(false))
+      else if (from < to && !result.isCompleted) checkUpToPara(v, from + one, to)
     }
-    (v <= three) || checkUpTo(two)
+    val testUpTo = sqrt(v)
+    val segmentSize = (testUpTo - two)/fromInt(cores)
+    @tailrec
+    def makeWorkers(cur:NUM, wks:List[Future[Unit]]=List.empty):List[Future[Unit]] = {
+      if (cur >= testUpTo) wks
+      else {
+        val next=cur+segmentSize
+        makeWorkers(next+one, Future{checkUpToPara(v, cur, next)}::wks)
+      }
+    }
+    val workers = makeWorkers(two) 
+    Await.ready(Future.sequence(workers), Duration.Inf)
+    
+    !result.isCompleted
   }
 
+  /**
+   *
+   */
   private class EratosthenesCell(val value: NUM) {
     private var marked = false
     def mark() { marked = true }
@@ -64,38 +97,38 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
     def isPrime() = marked == false // true for primes only once the sieve of eratosthenes is finished
     override def toString() = s"ECell($value, $marked)"
   }
-  
+
   /**
    *
    */
-  def eratosthenesSieve(v: NUM): List[CheckedValue[NUM]] = {
-    val upTo = sqrt(v)
-    @tailrec
-    def buildSieve(it: NumericReverseIterator[NUM], cur: List[EratosthenesCell] = Nil): List[EratosthenesCell] =
-      if (it.hasNext) buildSieve(it, new EratosthenesCell(it.next) :: cur) else cur
-    @tailrec
-    def mark(multiples: Stream[NUM], cur: List[EratosthenesCell]) {
-      cur.headOption match {
-        case None                    =>
-        case _ if multiples.head > v =>
-        case Some(cell) if cell.value == multiples.head =>
-          cell.mark()
-          mark(multiples.tail, cur.tail)
-        case Some(cell) =>
-          mark(multiples, cur.tail)
-      }
+  @tailrec
+  private final def buildSieve(it: NumericReverseIterator[NUM], cur: List[EratosthenesCell] = Nil): List[EratosthenesCell] =
+    if (it.hasNext) buildSieve(it, new EratosthenesCell(it.next) :: cur) else cur
+  @tailrec
+  private final def eratMark(limit:NUM, multiples: Stream[NUM], cur: List[EratosthenesCell]) {
+    cur.headOption match {
+      case None                    =>
+      case _ if multiples.head > limit =>
+      case Some(cell) if cell.value == multiples.head =>
+        cell.mark()
+        eratMark(limit, multiples.tail, cur.tail)
+      case Some(cell) =>
+        eratMark(limit, multiples, cur.tail)
     }
-    @tailrec
-    def worker(cur: List[EratosthenesCell]) {
-      if (!cur.isEmpty && cur.head.value <=upTo) {
-        if (!cur.head.isMarked) {
-          mark(new NumericIterator[NUM](two).toStream.map(_ * cur.head.value), cur.tail)
-        }
-        worker(cur.tail)
+  }
+  @tailrec
+  private final def eratWorker(limit:NUM, upTo:NUM, cur: List[EratosthenesCell]) {
+    if (!cur.isEmpty && cur.head.value <= upTo) {
+      if (!cur.head.isMarked) {
+        eratMark(limit, new NumericIterator[NUM](two).toStream.map(_ * cur.head.value), cur.tail)
       }
+      eratWorker(limit, upTo, cur.tail)
     }
-    val sieve = buildSieve(new NumericReverseIterator[NUM](v, _ > two))
-    worker(sieve)
+  }
+  final def eratosthenesSieve(limit: NUM): List[CheckedValue[NUM]] = {
+    val upTo = sqrt(limit)
+    val sieve = buildSieve(new NumericReverseIterator[NUM](limit, _ > two))
+    eratWorker(limit, upTo, sieve)
     var nthIsPrime = zero
     var nthIsNotPrime = zero
     def computeNth(isp: Boolean): NUM = {
