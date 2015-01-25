@@ -3,6 +3,7 @@ Release 1.2.1
   - akka 2.3.9
   - paul philipps "sbt" launcher script added 
   - Sieve of Eratosthenes algorithm added
+  - less autoboxing in isPrime & isPrimePara (checkUpTo) => performance enhancements
 
 Release 1.2.0
   - scala 2.11.4
@@ -14,3 +15,4 @@ Release 1.2.0
     => But in this implementation the output order is not preserved...
   - ActorsPrimesGenerator algorithm
     => Here the order is preserved
+/Users/dcr/Dev/primes/RELEASENOTES.md

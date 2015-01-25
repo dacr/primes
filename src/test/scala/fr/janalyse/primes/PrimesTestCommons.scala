@@ -13,7 +13,7 @@ trait PrimesTestCommons  extends FunSuite with ShouldMatchers {
   val os = ManagementFactory.getOperatingSystemMXBean()
   def lastMinuteCpuAverage() = (os.getSystemLoadAverage() * 100).toInt
 
-  def howlongfor[T](param: Int, proc: Int => T)(infoOnResult: T => String): T = {
+  def howlongfor[U, T](param: U)(proc: U => T)(infoOnResult: T => String): T = {
     now match {
       case start =>
         val result = proc(param)

@@ -49,7 +49,7 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
 
   @tailrec
   private final def checkUpTo(v: NUM, from: NUM, upTo: NUM): Boolean = {
-    if (v % from == 0) false
+    if (v % from == zero) false
     else if (from == upTo) true else checkUpTo(v, from + one, upTo)
   }
   final def isPrime(v: NUM): Boolean = {
@@ -67,18 +67,18 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
     import scala.util._
     val result = Promise[Boolean]
     @tailrec
-    def checkUpToPara(v: NUM, from: NUM, to: NUM) {
-      if (v % from == 0) result.complete(Success(false))
-      else if (from < to && !result.isCompleted) checkUpToPara(v, from + one, to)
+    def checkUpToPara(from: NUM, to: NUM) {
+      if (v % from == zero) result.complete(Success(false))
+      else if (from < to && !result.isCompleted) checkUpToPara(from + one, to)
     }
     val testUpTo = sqrt(v)
     val segmentSize = (testUpTo - two)/fromInt(cores)
     @tailrec
     def makeWorkers(cur:NUM, wks:List[Future[Unit]]=List.empty):List[Future[Unit]] = {
-      if (cur >= testUpTo) wks
+      if (cur > testUpTo) wks
       else {
         val next=cur+segmentSize
-        makeWorkers(next+one, Future{checkUpToPara(v, cur, next)}::wks)
+        makeWorkers(next+one, Future{checkUpToPara(cur, next)}::wks)
       }
     }
     val workers = makeWorkers(two) 

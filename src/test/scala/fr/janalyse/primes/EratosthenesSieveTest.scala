@@ -38,8 +38,8 @@ class EratosthenesSieveTest extends PrimesTestCommons {
     val dp = new PrimesDefinitions[BigInt]()
     val gp = new PrimesGenerator[BigInt]()
     
-    howlongfor(howmany, x=> gp.checkedValues.takeWhile(_.value <= x).toList)(x => "Classic last="+x.last)
-    howlongfor(howmany, dp.eratosthenesSieve(_))(x => "Eratosthenes last="+x.last)
+    howlongfor(howmany)(x=> gp.checkedValues.takeWhile(_.value <= x).toList)(x => "Classic last="+x.last)
+    howlongfor(howmany)(dp.eratosthenesSieve(_))(x => "Eratosthenes last="+x.last)
     info("(Mono-thread algorithms)")
   }
 }
