@@ -50,28 +50,26 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
     n1
   }
 
-  @tailrec
-  private final def checkUpTo(v: NUM, from: NUM, upTo: NUM): Boolean = {
-    if (v % from == zero) false
-    else if (from == upTo) true else checkUpTo(v, from + one, upTo)
-  }
   final def isPrime(v: NUM): Boolean = {
     val upTo = sqrt(v)
-    (v <= three) || checkUpTo(v, two, upTo)
+    @tailrec
+    def checkUpTo(from: NUM): Boolean = {
+      if (v % from == zero) false
+      else if (from == upTo) true else checkUpTo(from + one)
+    }
+    (v <= three) || checkUpTo(two)
   }
 
-  /**
-   *
-   */
-  def isPrimePara(v: NUM, cores: Int = java.lang.Runtime.getRuntime.availableProcessors)(implicit ec: ExecutionContext): Boolean = {
+  val coresCount: NUM = fromInt(java.lang.Runtime.getRuntime.availableProcessors)
+  final def isPrimePara(v: NUM)(implicit ec: ExecutionContext): Boolean = {
     val result = Promise[Boolean]
+    val testUpTo = sqrt(v)
+    val segmentSize = (testUpTo - two) / coresCount
     @tailrec
     def checkUpToPara(from: NUM, to: NUM) {
       if (v % from == zero) result.complete(Success(false))
       else if (from < to && !result.isCompleted) checkUpToPara(from + one, to)
     }
-    val testUpTo = sqrt(v)
-    val segmentSize = (testUpTo - two) / fromInt(cores)
     @tailrec
     def makeWorkers(cur: NUM, wks: List[Future[Unit]] = List.empty): List[Future[Unit]] = {
       if (cur > testUpTo) wks
@@ -80,9 +78,7 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
         makeWorkers(next + one, Future { checkUpToPara(cur, next) } :: wks)
       }
     }
-    val workers = makeWorkers(two)
-    Await.ready(Future.sequence(workers), Duration.Inf)
-
+    Await.ready(Future.sequence(makeWorkers(two)), Duration.Inf)
     !result.isCompleted
   }
 
