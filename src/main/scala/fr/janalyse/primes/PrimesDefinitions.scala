@@ -5,6 +5,9 @@ import java.awt.image.BufferedImage
 import java.awt.Color
 import annotation.tailrec
 import java.awt.Graphics2D
+import scala.concurrent._
+import scala.concurrent.duration._
+import scala.util._
 
 class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
 
@@ -19,7 +22,7 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
   protected final val eight = four + four
   protected final val nine = five + four
   protected final val ten = five + five
-  
+
   @tailrec
   private final def powit(n: NUM, cur: NUM, r: NUM): NUM = {
     if (r == one) cur else powit(n, cur * n, r - one)
@@ -56,15 +59,11 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
     val upTo = sqrt(v)
     (v <= three) || checkUpTo(v, two, upTo)
   }
-  
+
   /**
    *
    */
-  def isPrimePara(v:NUM, cores:Int = java.lang.Runtime.getRuntime.availableProcessors):Boolean = {
-    import scala.concurrent._
-    import scala.concurrent.duration._
-    import scala.concurrent.ExecutionContext.Implicits.global
-    import scala.util._
+  def isPrimePara(v: NUM, cores: Int = java.lang.Runtime.getRuntime.availableProcessors)(implicit ec: ExecutionContext): Boolean = {
     val result = Promise[Boolean]
     @tailrec
     def checkUpToPara(from: NUM, to: NUM) {
@@ -72,18 +71,18 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
       else if (from < to && !result.isCompleted) checkUpToPara(from + one, to)
     }
     val testUpTo = sqrt(v)
-    val segmentSize = (testUpTo - two)/fromInt(cores)
+    val segmentSize = (testUpTo - two) / fromInt(cores)
     @tailrec
-    def makeWorkers(cur:NUM, wks:List[Future[Unit]]=List.empty):List[Future[Unit]] = {
+    def makeWorkers(cur: NUM, wks: List[Future[Unit]] = List.empty): List[Future[Unit]] = {
       if (cur > testUpTo) wks
       else {
-        val next=cur+segmentSize
-        makeWorkers(next+one, Future{checkUpToPara(cur, next)}::wks)
+        val next = cur + segmentSize
+        makeWorkers(next + one, Future { checkUpToPara(cur, next) } :: wks)
       }
     }
-    val workers = makeWorkers(two) 
+    val workers = makeWorkers(two)
     Await.ready(Future.sequence(workers), Duration.Inf)
-    
+
     !result.isCompleted
   }
 
@@ -105,9 +104,9 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
   private final def buildSieve(it: NumericReverseIterator[NUM], cur: List[EratosthenesCell] = Nil): List[EratosthenesCell] =
     if (it.hasNext) buildSieve(it, new EratosthenesCell(it.next) :: cur) else cur
   @tailrec
-  private final def eratMark(limit:NUM, multiples: Stream[NUM], cur: List[EratosthenesCell]) {
+  private final def eratMark(limit: NUM, multiples: Stream[NUM], cur: List[EratosthenesCell]) {
     cur.headOption match {
-      case None                    =>
+      case None                        =>
       case _ if multiples.head > limit =>
       case Some(cell) if cell.value == multiples.head =>
         cell.mark()
@@ -117,7 +116,7 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
     }
   }
   @tailrec
-  private final def eratWorker(limit:NUM, upTo:NUM, cur: List[EratosthenesCell]) {
+  private final def eratWorker(limit: NUM, upTo: NUM, cur: List[EratosthenesCell]) {
     if (!cur.isEmpty && cur.head.value <= upTo) {
       if (!cur.head.isMarked) {
         eratMark(limit, new NumericIterator[NUM](two).toStream.map(_ * cur.head.value), cur.tail)
