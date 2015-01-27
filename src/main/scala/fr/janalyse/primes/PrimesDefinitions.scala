@@ -61,6 +61,7 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
   }
 
   val coresCount: NUM = fromInt(java.lang.Runtime.getRuntime.availableProcessors)
+  
   final def isPrimePara(v: NUM)(implicit ec: ExecutionContext): Boolean = {
     val result = Promise[Boolean]
     val testUpTo = sqrt(v)
