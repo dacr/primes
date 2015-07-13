@@ -1,16 +1,12 @@
-import AssemblyKeys._
-
-seq(assemblySettings: _*)
-
 name := "primes"
 
-version := "1.2.1"
+version := "1.2.2-SNAPSHOT"
 
 organization :="fr.janalyse"
 
 organizationHomepage := Some(new URL("http://www.janalyse.fr"))
 
-scalaVersion := "2.11.5"
+scalaVersion := "2.11.7"
 
 // Mandatory as tests are also used for performances testing...
 parallelExecution in Test := false
@@ -32,13 +28,12 @@ libraryDependencies ++= Seq(
    "com.typesafe.akka" %% "akka-stream-experimental" % "1.0-M2"
 )
 
-resolvers += "Typesafe repository releases" at "http://repo.typesafe.com/typesafe/releases/"
-
 
 initialCommands in console := """
-  import fr.janalyse.primes._
-  val pgen=new PrimesGenerator[Long]
-"""
+  |import fr.janalyse.primes._
+  |val pgen=new PrimesGenerator[Long]
+  |""".stripMargin
+
 
 sourceGenerators in Compile <+= 
  (sourceManaged in Compile, version, name, jarName in assembly) map {
@@ -55,10 +50,4 @@ sourceGenerators in Compile <+=
   Seq(file)
 }
 
-publishTo := Some(
-     Resolver.sftp(
-         "JAnalyse Repository",
-         "www.janalyse.fr",
-         "/home/tomcat/webapps-janalyse/repository"
-     ) as("tomcat", new File(util.Properties.userHome+"/.ssh/id_rsa"))
-)
+resolvers += "Typesafe repository releases" at "http://repo.typesafe.com/typesafe/releases/"
