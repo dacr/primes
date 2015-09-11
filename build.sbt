@@ -4,20 +4,20 @@ seq(assemblySettings: _*)
 
 name := "primes"
 
-version := "1.2.1"
+version := "1.2.2-SNAPSHOT"
 
 organization :="fr.janalyse"
 
 organizationHomepage := Some(new URL("http://www.janalyse.fr"))
 
-scalaVersion := "2.11.5"
+scalaVersion := "2.11.7"
 
 // Mandatory as tests are also used for performances testing...
 parallelExecution in Test := false
 
 scalacOptions ++= Seq( "-deprecation", "-unchecked", "-feature")
 
-crossScalaVersions := Seq("2.10.4", "2.11.5")
+crossScalaVersions := Seq("2.10.5", "2.11.7")
 
 mainClass in assembly := Some("fr.janalyse.primes.Main")
 
@@ -55,10 +55,3 @@ sourceGenerators in Compile <+=
   Seq(file)
 }
 
-publishTo := Some(
-     Resolver.sftp(
-         "JAnalyse Repository",
-         "www.janalyse.fr",
-         "/home/tomcat/webapps-janalyse/repository"
-     ) as("tomcat", new File(util.Properties.userHome+"/.ssh/id_rsa"))
-)
