@@ -1,13 +1,12 @@
 package fr.janalyse.primes
 
 import akka.actor.ActorSystem
-import akka.stream.FlowMaterializer
-import akka.stream.scaladsl.{ Broadcast, FlowGraph, ForeachSink, Source }
+//import akka.stream.FlowMaterializer
+import akka.stream.scaladsl._
 
 import scala.concurrent.forkjoin.ThreadLocalRandom
 import scala.concurrent.Future
 import scala.util.{ Failure, Success, Try }
-import akka.stream.scaladsl.FlowGraphImplicits
 import akka.stream.scaladsl._
 
 
@@ -32,13 +31,14 @@ class StreamBasedPrimesGenerator[NUM](
 
   implicit val system = ActorSystem(name)
   import system.dispatcher
-  implicit val materializer = FlowMaterializer()
+//  implicit val materializer = FlowMaterializer()
   
   case class TestedValue(value:NUM) {
     val state = isPrime(value)
     val digitCount = value.toString.size
   }
   
+  //val materialized = FlowGraph { implicit builder =>
   val materialized = FlowGraph { implicit builder =>
     import FlowGraphImplicits._
 

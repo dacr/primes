@@ -1,3 +1,8 @@
+Release 1.2.2-SNAPSHOT
+  - akka 2.3.13
+  - scala 2.11.7 & 2.10.5
+
+
 Release 1.2.1
   - scala 2.11.5
   - akka 2.3.9

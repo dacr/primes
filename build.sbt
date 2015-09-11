@@ -1,7 +1,3 @@
-import AssemblyKeys._
-
-seq(assemblySettings: _*)
-
 name := "primes"
 
 version := "1.2.2-SNAPSHOT"
@@ -25,20 +21,17 @@ jarName in assembly := "primes.jar"
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.+" % "test"
 
-libraryDependencies += "junit" % "junit" % "4.+" % "test"
-
 libraryDependencies ++= Seq(
-   "com.typesafe.akka" %% "akka-actor" % "2.3.9",
-   "com.typesafe.akka" %% "akka-stream-experimental" % "1.0-M2"
+   "com.typesafe.akka" %% "akka-actor" % "2.3.13",
+   "com.typesafe.akka" %% "akka-stream-experimental" % "1.0"
 )
-
-resolvers += "Typesafe repository releases" at "http://repo.typesafe.com/typesafe/releases/"
 
 
 initialCommands in console := """
-  import fr.janalyse.primes._
-  val pgen=new PrimesGenerator[Long]
-"""
+  |import fr.janalyse.primes._
+  |val pgen=new PrimesGenerator[Long]
+  |""".stripMargin
+
 
 sourceGenerators in Compile <+= 
  (sourceManaged in Compile, version, name, jarName in assembly) map {
@@ -55,3 +48,4 @@ sourceGenerators in Compile <+=
   Seq(file)
 }
 
+resolvers += "Typesafe repository releases" at "http://repo.typesafe.com/typesafe/releases/"
