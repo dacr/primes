@@ -26,6 +26,8 @@ libraryDependencies ++= Seq(
    "com.typesafe.akka" %% "akka-stream-experimental" % "1.0"
 )
 
+libraryDependencies += "junit" % "junit" % "4.+" % "test"
+
 
 initialCommands in console := """
   |import fr.janalyse.primes._

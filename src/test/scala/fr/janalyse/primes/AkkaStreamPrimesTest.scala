@@ -5,7 +5,7 @@
  */
 
 package fr.janalyse.primes
-
+/*
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.ShouldMatchers
@@ -36,3 +36,5 @@ class AkkaStreamPrimesTest extends PrimesTestCommons {
 
   }
 }
+*/
+

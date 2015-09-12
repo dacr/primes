@@ -12,6 +12,7 @@ import java.lang.management.ManagementFactory
 import scala.concurrent._
 import scala.concurrent.duration._
 
+/*
 @RunWith(classOf[JUnitRunner])
 class PerfAkkaStreamPrimesTest extends PrimesTestCommons {
 
@@ -21,3 +22,4 @@ class PerfAkkaStreamPrimesTest extends PrimesTestCommons {
   }
  
 }
+*/

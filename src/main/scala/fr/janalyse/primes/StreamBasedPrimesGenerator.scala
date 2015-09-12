@@ -1,5 +1,7 @@
 package fr.janalyse.primes
 
+/*
+
 import akka.actor.ActorSystem
 //import akka.stream.FlowMaterializer
 import akka.stream.scaladsl._
@@ -78,4 +80,4 @@ class StreamBasedPrimesGenerator[NUM](
 
   override def shutdown() { system.shutdown()}
 }
-
+*/
