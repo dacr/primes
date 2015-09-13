@@ -22,8 +22,9 @@ jarName in assembly := "primes.jar"
 libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.+" % "test"
 
 libraryDependencies ++= Seq(
-   "com.typesafe.akka" %% "akka-actor" % "2.3.13",
-   "com.typesafe.akka" %% "akka-stream-experimental" % "1.0"
+    "com.typesafe.akka" %% "akka-actor" % "2.3.13"
+   ,"com.typesafe.akka" %% "akka-stream-experimental" % "1.0"
+   ,"org.slf4j"          % "slf4j-api"          % "1.7.+"
 )
 
 libraryDependencies += "junit" % "junit" % "4.+" % "test"
