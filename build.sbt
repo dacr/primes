@@ -1,6 +1,8 @@
+import Tools._
+
 name := "primes"
 
-version := "1.2.2-SNAPSHOT"
+version := penvOrElse("PRIMES_REV", "1.2.2-SNAPSHOT")
 
 organization :="fr.janalyse"
 
