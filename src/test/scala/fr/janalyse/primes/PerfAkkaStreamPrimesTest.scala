@@ -6,14 +6,12 @@
 
 package fr.janalyse.primes
 
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+/*
 import java.lang.management.ManagementFactory
 import scala.concurrent._
 import scala.concurrent.duration._
 
-/*
-@RunWith(classOf[JUnitRunner])
+
 class PerfAkkaStreamPrimesTest extends PrimesTestCommons {
 
   test("akka actors streams based computation test - BigInt") {

@@ -4,10 +4,9 @@ import java.lang.management.ManagementFactory
 import scala.concurrent._
 import scala.concurrent.duration._
 import org.scalatest.FunSuite
-import org.scalatest.ShouldMatchers
 
 
-trait PrimesTestCommons  extends FunSuite with ShouldMatchers {
+trait PrimesTestCommons  extends FunSuite {
   val cpuCount = java.lang.Runtime.getRuntime.availableProcessors
   def now = System.currentTimeMillis
   val os = ManagementFactory.getOperatingSystemMXBean()

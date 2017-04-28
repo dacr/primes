@@ -1,5 +1,5 @@
 package fr.janalyse.primes
-
+/*
 import akka.actor._
 import ActorDSL._
 import akka.routing.SmallestMailboxPool
@@ -123,3 +123,4 @@ class ActorsPrimesUnorderedGenerator[NUM](
 }
 
 
+*/

@@ -6,13 +6,9 @@
 
 package fr.janalyse.primes
 
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.ShouldMatchers
-import org.scalatest.junit.JUnitRunner
+import org.scalatest.Matchers._
 import org.scalatest.OptionValues._
 
-@RunWith(classOf[JUnitRunner])
 class EratosthenesSieveTest extends PrimesTestCommons {
 
   test("basic tests") {

@@ -6,12 +6,8 @@
 
 package fr.janalyse.primes
 
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.ShouldMatchers
-import org.scalatest.junit.JUnitRunner
+import org.scalatest.Matchers._
 
-@RunWith(classOf[JUnitRunner])
 class PrimesTest extends PrimesTestCommons {
 
   test("Simple tests") {

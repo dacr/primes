@@ -6,15 +6,12 @@
 
 package fr.janalyse.primes
 
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.ShouldMatchers
-import org.scalatest.junit.JUnitRunner
 import scala.concurrent.ExecutionContext
 import java.util.concurrent.{ Executors, ThreadPoolExecutor, TimeUnit }
 import scala.concurrent.forkjoin.ForkJoinPool
+import org.scalatest.Matchers._
 
-@RunWith(classOf[JUnitRunner])
+
 class IsPrimesTest extends PrimesTestCommons {
 
   //val ec = ExecutionContext.Implicits.global
