@@ -15,7 +15,7 @@ class PrimesGenerator[NUM](implicit numops: Integral[NUM]) extends PrimesDefinit
 
   // ------------------------ STREAMS ------------------------
 
-  def integers = {
+  def integers: Stream[NUM] = {
     def next(cur: NUM): Stream[NUM] = cur #:: next(cur + one)
     next(one)
   }
@@ -29,7 +29,7 @@ class PrimesGenerator[NUM](implicit numops: Integral[NUM]) extends PrimesDefinit
       val isPrimeResult = isPrime(nextvalue)
       val nth = if (isPrimeResult) primeNth + one else notPrimeNth + one
       checkedValues(
-        CheckedValue[NUM](nextvalue, isPrimeResult, nextvalue.toString.size, nth),
+        CheckedValue[NUM](nextvalue, isPrimeResult, nextvalue.toString.length, nth),
         if (isPrimeResult) nth else primeNth,
         if (isPrimeResult) notPrimeNth else nth)
     }
@@ -56,45 +56,45 @@ class PrimesGenerator[NUM](implicit numops: Integral[NUM]) extends PrimesDefinit
   def checkedValues: Stream[CheckedValue[NUM]] =
     checkedValues(CheckedValue.first[NUM], one, zero)
 
-  def candidates = integers.tail
+  def candidates: Stream[NUM] = integers.tail
 
-  def primes =
+  def primes: Stream[NUM] =
     candidates
-      .filter(isPrime(_))
+      .filter(isPrime)
 
-  def notPrimes =
+  def notPrimes: Stream[NUM] =
     candidates
-      .filterNot(isPrime(_))
+      .filterNot(isPrime)
 
   // distances between consecutive primes
-  def distances =
+  def distances: Stream[NUM] =
     primes
       .sliding(2, 1)
       .map(slice => slice.tail.head - slice.head)
       .toStream
 
-  def primesPar =
+  def primesPar: Stream[NUM] =
     candidates
       .iterator //  workaround for Memory impact of the .par on just stream is too huge...
       .grouped(1000)
       .map(_.par)
-      .flatMap(_.filter(isPrime(_)))
+      .flatMap(_.filter(isPrime))
       .toStream
 
-  def mersennePrimes =
+  def mersennePrimes: Stream[NUM] =
     candidates
       .filter(isMersennePrimeExponent(_))
       .map(pow(two, _) - one)
 
-  def sexyPrimes =
+  def sexyPrimes: Stream[NUM] =
     candidates
       .filter(isSexyPrime(_))
 
-  def twinPrimes =
+  def twinPrimes: Stream[NUM] =
     candidates
       .filter(isTwinPrime(_))
 
-  def isolatedPrimes =
+  def isolatedPrimes: Stream[NUM] =
     candidates
       .filter(isIsolatedPrime(_))
 

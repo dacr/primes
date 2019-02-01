@@ -7,8 +7,8 @@ version := penvOrElse("PRIMES_REV", "1.2.2-SNAPSHOT")
 organization :="fr.janalyse"
 organizationHomepage := Some(new URL("http://www.janalyse.fr"))
 
-scalaVersion := "2.12.2"
-crossScalaVersions := Seq("2.10.6", "2.11.8", "2.12.2")
+scalaVersion := "2.12.8"
+crossScalaVersions := Seq("2.10.7", "2.11.12", "2.12.8")
 
 
 // Mandatory as tests are also used for performances testing...
@@ -21,10 +21,8 @@ assemblyJarName := "primes.jar"
 
 
 libraryDependencies ++= Seq(
-//   "com.typesafe.akka" %% "akka-actor"               % "2.3.13"
-//  ,"com.typesafe.akka" %% "akka-stream-experimental" % "1.0"
-  "org.slf4j"          % "slf4j-api"                % "1.7.25"
-  ,"org.scalatest"     %% "scalatest"                % "3.0.3" % "test"
+  "org.slf4j"          % "slf4j-api"                % "1.7.25",
+  "org.scalatest"     %% "scalatest"                % "3.0.5" % "test",
 )
 
 initialCommands in console := """

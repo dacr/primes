@@ -18,8 +18,8 @@ object Main {
     import java.io.File
     import javax.imageio.ImageIO
 
-    ImageIO.write(ulamSpiral(size, checkedValues.iterator), "PNG", new File(s"ulam-spiral-${size}.png"));
-    ImageIO.write(sacksInspiredSpiral(size, 3, checkedValues.iterator), "PNG", new File(s"ulam-sacks-like-${size}.png"));
+    ImageIO.write(ulamSpiral(size, checkedValues.iterator), "PNG", new File(s"ulam-spiral-$size.png"))
+    ImageIO.write(sacksInspiredSpiral(size, 3, checkedValues.iterator), "PNG", new File(s"ulam-sacks-like-$size.png"))
   }
 
   // -------------------------------------------------------------
@@ -36,15 +36,15 @@ object Main {
 
 
   def sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S Z")
-  def now = System.currentTimeMillis
+  def now: Long = System.currentTimeMillis
   
   
   case class RunningContext(props:Map[String,String])
   object RunningContext{
     import scala.util.Try
     
-    def getHostname(): Option[(String,String)] = {
-      Try(java.net.InetAddress.getLocalHost().getHostName()).map("hostname"-> _).toOption
+    def hostname: Option[(String,String)] = {
+      Try(java.net.InetAddress.getLocalHost.getHostName).map("hostname"-> _).toOption
     }
     
     def apply():RunningContext = {
@@ -55,7 +55,7 @@ object Main {
           "javaVendor"->scala.util.Properties.javaVendor,
           "osName"->scala.util.Properties.osName
         )
-          ++ getHostname()
+          ++ hostname
           ++ scala.util.Properties.propOrNone("os.version").map("osVersion" -> _)
           ++ scala.util.Properties.propOrNone("os.arch").map("osArch" -> _)
       )
@@ -75,7 +75,7 @@ object Main {
     results.map{case (k,v) => s""""$k":$v"""}.mkString("{", ", ", "}")
   }
   
-  def howlongfor[U, T](param: U)(proc: U => T)(infoOnResult: T => String)(implicit context:RunningContext): T = {
+  def howLongFor[U, T](param: U)(proc: U => T)(infoOnResult: T => String)(implicit context:RunningContext): T = {
     now match {
       case start =>
         val result = proc(param)
@@ -92,21 +92,21 @@ object Main {
   }
 
   def main(args:Array[String]):Unit = {
-    
+
     val numRE="""(\d+)""".r
     val roundMax= args.headOption match {
       case Some(numRE(value)) => value.toInt
       case _=> Int.MaxValue
     }
-    
-    implicit val context = RunningContext()
-    
+
+    implicit val context: RunningContext = RunningContext()
+
     val pgen = new PrimesGenerator[Long]
     import pgen._
-    
+
     @annotation.tailrec
     def perfLoop(sz:Int,step:Int=25000, round:Int=1) {
-      howlongfor(sz)(primes.drop(_).head)("lastPrime=" + _.toString)
+      howLongFor(sz)(primes.drop(_).head)("lastPrime=" + _.toString)
       if (round < roundMax) perfLoop(sz+step, step=step, round=round+1)
     }
     perfLoop(50000)
