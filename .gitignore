@@ -8,8 +8,6 @@ target/
 .project
 .cache
 .settings
-images/
-*.png
 nohup.out
 /bin/
 .idea

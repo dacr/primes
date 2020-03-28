@@ -8,7 +8,7 @@ $ sbt "run 1000"
 ```
 It will generate a PNG image file named "ulam-spiral-500.png"
 
-![](ulam-spiral-100.png)
+![](images/ulam-spiral-200.png)
 
 To starts the console and play with primes :
 ```
