@@ -101,7 +101,7 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
   private final def buildSieve(it: NumericReverseIterator[NUM], cur: List[EratosthenesCell] = Nil): List[EratosthenesCell] =
     if (it.hasNext) buildSieve(it, new EratosthenesCell(it.next) :: cur) else cur
   @tailrec
-  private final def eratMark(limit: NUM, multiples: Stream[NUM], cur: List[EratosthenesCell]) {
+  private final def eratMark(limit: NUM, multiples: LazyList[NUM], cur: List[EratosthenesCell]) {
     cur.headOption match {
       case None                        =>
       case _ if multiples.head > limit =>
@@ -116,7 +116,7 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
   private final def eratWorker(limit: NUM, upTo: NUM, cur: List[EratosthenesCell]) {
     if (!cur.isEmpty && cur.head.value <= upTo) {
       if (!cur.head.isMarked) {
-        eratMark(limit, new NumericIterator[NUM](two).toStream.map(_ * cur.head.value), cur.tail)
+        eratMark(limit, new NumericIterator[NUM](two).to(LazyList).map(_ * cur.head.value), cur.tail)
       }
       eratWorker(limit, upTo, cur.tail)
     }

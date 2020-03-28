@@ -6,13 +6,8 @@
 
 package fr.janalyse.primes
 
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.ShouldMatchers
-import org.scalatest.junit.JUnitRunner
 import org.scalatest.OptionValues._
 
-@RunWith(classOf[JUnitRunner])
 class EratosthenesSieveTest extends PrimesTestCommons {
 
   test("basic tests") {
@@ -33,13 +28,13 @@ class EratosthenesSieveTest extends PrimesTestCommons {
     found should equal(gp.checkedValues.takeWhile { _.value <= howmany })
   }
 
-  test("EratosthenesSieve performance test") {
-    val howmany = 500000
-    val dp = new PrimesDefinitions[BigInt]()
-    val gp = new PrimesGenerator[BigInt]()
-    
-    howlongfor(howmany)(x=> gp.checkedValues.takeWhile(_.value <= x).toList)(x => "Classic last="+x.last)
-    howlongfor(howmany)(dp.eratosthenesSieve(_))(x => "Eratosthenes last="+x.last)
-    info("(Mono-thread algorithms)")
-  }
+//  test("EratosthenesSieve performance test") {
+//    val howmany = 500000
+//    val dp = new PrimesDefinitions[BigInt]()
+//    val gp = new PrimesGenerator[BigInt]()
+//
+//    howlongfor(howmany)(x=> gp.checkedValues.takeWhile(_.value <= x).toList)(x => "Classic last="+x.last)
+//    howlongfor(howmany)(dp.eratosthenesSieve(_))(x => "Eratosthenes last="+x.last)
+//    info("(Mono-thread algorithms)")
+//  }
 }

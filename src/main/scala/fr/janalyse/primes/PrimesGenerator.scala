@@ -73,13 +73,13 @@ class PrimesGenerator[NUM](implicit numops: Integral[NUM]) extends PrimesDefinit
       .map(slice => slice.tail.head - slice.head)
       .toStream
 
-  def primesPar =
-    candidates
-      .iterator //  workaround for Memory impact of the .par on just stream is too huge...
-      .grouped(1000)
-      .map(_.par)
-      .flatMap(_.filter(isPrime(_)))
-      .toStream
+//  def primesPar =
+//    candidates
+//      .iterator //  workaround for Memory impact of the .par on just stream is too huge...
+//      .grouped(1000)
+//      .map(_.par)
+//      .flatMap(_.filter(isPrime(_)))
+//      .toStream
 
   def mersennePrimes =
     candidates

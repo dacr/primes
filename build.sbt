@@ -1,54 +1,32 @@
 name := "primes"
-
-version := "1.2.2-SNAPSHOT"
-
 organization :="fr.janalyse"
+homepage := Some(new URL("https://github.com/dacr/primes"))
+licenses += "Apache 2" -> url(s"http://www.apache.org/licenses/LICENSE-2.0.txt")
+scmInfo := Some(ScmInfo(url(s"https://github.com/dacr/primes"), s"git@github.com:dacr/primes.git"))
 
-organizationHomepage := Some(new URL("http://www.janalyse.fr"))
-
-scalaVersion := "2.11.7"
-
-// Mandatory as tests are also used for performances testing...
-parallelExecution in Test := false
-
+scalaVersion := "2.13.1"
 scalacOptions ++= Seq( "-deprecation", "-unchecked", "-feature")
 
-crossScalaVersions := Seq("2.10.5", "2.11.7")
+crossScalaVersions := Seq("2.13.1")
 
-mainClass in assembly := Some("fr.janalyse.primes.Main")
 
-jarName in assembly := "primes.jar"
-
-libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.+" % "test"
+parallelExecution in Test := false
 
 libraryDependencies ++= Seq(
-    "com.typesafe.akka" %% "akka-actor" % "2.3.13"
-   ,"com.typesafe.akka" %% "akka-stream-experimental" % "1.0"
-   ,"org.slf4j"          % "slf4j-api"          % "1.7.+"
+  "org.slf4j"     % "slf4j-api"    % "1.7.+",
+  "org.scalatest" %% "scalatest"   % "3.1.1" % "test"
 )
 
-libraryDependencies += "junit" % "junit" % "4.+" % "test"
-
+testOptions in Test += {
+  val rel = scalaVersion.value.split("[.]").take(2).mkString(".")
+  Tests.Argument(
+    "-oDF", // -oW to remove colors
+    "-u", s"target/junitresults/scala-$rel/"
+  )
+}
 
 initialCommands in console := """
   |import fr.janalyse.primes._
   |val pgen=new PrimesGenerator[Long]
   |""".stripMargin
 
-
-sourceGenerators in Compile <+= 
- (sourceManaged in Compile, version, name, jarName in assembly) map {
-  (dir, version, projectname, jarexe) =>
-  val file = dir / "primes" / "MetaInfo.scala"
-  IO.write(file,
-  """package primes
-    |object MetaInfo { 
-    |  val version="%s"
-    |  val project="%s"
-    |  val jarbasename="%s"
-    |}
-    |""".stripMargin.format(version, projectname, jarexe.split("[.]").head) )
-  Seq(file)
-}
-
-resolvers += "Typesafe repository releases" at "http://repo.typesafe.com/typesafe/releases/"
