@@ -1,4 +1,4 @@
-# primes core lib
+# primes [![Build Status][travisImg]][travisLink] [![License][licenseImg]][licenseLink] [![Maven][mavenImg]][mavenLink]
 
 Playing with primes using scala language. Draw Ulam spiral, ...
 
@@ -8,6 +8,7 @@ $ sbt "run 1000"
 ```
 It will generate a PNG image file named "ulam-spiral-500.png"
 
+![](ulam-spiral-100.png)
 
 To starts the console and play with primes :
 ```
@@ -78,5 +79,13 @@ res0: fr.janalyse.primes.CheckedValue[BigInt] = CheckedValue(100,false,3,74)
   
 ```
 
-
 and so one...
+
+[travisImg]: https://img.shields.io/travis/dacr/primes.svg
+[travisLink]:https://travis-ci.org/dacr/primes
+
+[mavenImg]: https://img.shields.io/maven-central/v/fr.janalyse/primes_2.13.svg
+[mavenLink]: https://search.maven.org/#search%7Cga%7C1%7Cfr.janalyse.primes
+
+[licenseImg]: https://img.shields.io/github/license/dacr/primes.svg
+[licenseLink]: LICENSE

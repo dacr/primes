@@ -12,18 +12,17 @@ class PrimesGenerator[NUM](implicit numops: Integral[NUM]) extends PrimesDefinit
   import annotation.tailrec
   import numops._
 
-
   // ------------------------ STREAMS ------------------------
 
-  def integers = {
-    def next(cur: NUM): Stream[NUM] = cur #:: next(cur + one)
+  def integers: LazyList[NUM] = {
+    def next(cur: NUM): LazyList[NUM] = cur #:: next(cur + one)
     next(one)
   }
 
   protected def checkedValues(
     cur: CheckedValue[NUM],
     primeNth: NUM,
-    notPrimeNth: NUM): Stream[CheckedValue[NUM]] =
+    notPrimeNth: NUM): LazyList[CheckedValue[NUM]] =
     cur #:: {
       val nextvalue = cur.value + one
       val isPrimeResult = isPrime(nextvalue)
@@ -36,7 +35,7 @@ class PrimesGenerator[NUM](implicit numops: Integral[NUM]) extends PrimesDefinit
 
   def checkedValues(
       foundLastPrime: Option[CheckedValue[NUM]],
-      foundLastNotPrime:Option[CheckedValue[NUM]]): Stream[CheckedValue[NUM]] = {
+      foundLastNotPrime:Option[CheckedValue[NUM]]): LazyList[CheckedValue[NUM]] = {
       val foundLast = for {
         flp <- foundLastPrime
         flnp <- foundLastNotPrime
@@ -53,25 +52,25 @@ class PrimesGenerator[NUM](implicit numops: Integral[NUM]) extends PrimesDefinit
       }
   }
   
-  def checkedValues: Stream[CheckedValue[NUM]] =
+  def checkedValues: LazyList[CheckedValue[NUM]] =
     checkedValues(CheckedValue.first[NUM], one, zero)
 
-  def candidates = integers.tail
+  def candidates:LazyList[NUM] = integers.tail
 
-  def primes =
+  def primes:LazyList[NUM] =
     candidates
       .filter(isPrime(_))
 
-  def notPrimes =
+  def notPrimes:LazyList[NUM] =
     candidates
       .filterNot(isPrime(_))
 
   // distances between consecutive primes
-  def distances =
+  def distances:LazyList[NUM] =
     primes
       .sliding(2, 1)
       .map(slice => slice.tail.head - slice.head)
-      .toStream
+      .to(LazyList)
 
 //  def primesPar =
 //    candidates
@@ -79,22 +78,22 @@ class PrimesGenerator[NUM](implicit numops: Integral[NUM]) extends PrimesDefinit
 //      .grouped(1000)
 //      .map(_.par)
 //      .flatMap(_.filter(isPrime(_)))
-//      .toStream
+//      .toLazyList
 
-  def mersennePrimes =
+  def mersennePrimes:LazyList[NUM] =
     candidates
       .filter(isMersennePrimeExponent(_))
       .map(pow(two, _) - one)
 
-  def sexyPrimes =
+  def sexyPrimes:LazyList[NUM] =
     candidates
       .filter(isSexyPrime(_))
 
-  def twinPrimes =
+  def twinPrimes:LazyList[NUM] =
     candidates
       .filter(isTwinPrime(_))
 
-  def isolatedPrimes =
+  def isolatedPrimes:LazyList[NUM] =
     candidates
       .filter(isIsolatedPrime(_))
 

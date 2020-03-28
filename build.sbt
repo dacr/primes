@@ -9,9 +9,6 @@ scalacOptions ++= Seq( "-deprecation", "-unchecked", "-feature")
 
 crossScalaVersions := Seq("2.13.1")
 
-
-parallelExecution in Test := false
-
 libraryDependencies ++= Seq(
   "org.slf4j"     % "slf4j-api"    % "1.7.+",
   "org.scalatest" %% "scalatest"   % "3.1.1" % "test"

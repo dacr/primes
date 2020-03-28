@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 David Crosson
+ * Copyright 2013-2020 David Crosson
  * 
  * Licensed under the GPL, Version 2.0
  */
