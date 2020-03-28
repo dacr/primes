@@ -12,7 +12,7 @@ class IsPrimesTest extends PrimesTestCommons {
     val gen = new PrimesGenerator[Int]
     import gen._
     import scala.concurrent.ExecutionContext.Implicits.global
-    val monos = integers.filter(isPrime(_)).take(100).toList
+    val monos = integers.filter(isPrime).take(100).toList
     val paras = integers.filter(isPrimePara(_)).take(100).toList
     paras should equal(monos)
   }

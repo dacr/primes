@@ -9,10 +9,7 @@ scalacOptions ++= Seq( "-deprecation", "-unchecked", "-feature")
 
 crossScalaVersions := Seq("2.13.1")
 
-libraryDependencies ++= Seq(
-  "org.slf4j"     % "slf4j-api"    % "1.7.+",
-  "org.scalatest" %% "scalatest"   % "3.1.1" % "test"
-)
+libraryDependencies += "org.scalatest" %% "scalatest"   % "3.1.1" % "test"
 
 testOptions in Test += {
   val rel = scalaVersion.value.split("[.]").take(2).mkString(".")

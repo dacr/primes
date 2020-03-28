@@ -48,10 +48,10 @@ class PrimesTest extends PrimesTestCommons {
 
   test("factorize tests") {
     val pgen = new PrimesGenerator[BigInt]
-    pgen.factorize(9, pgen.primes.toIterator) should equal(Some(List(3, 3)))
-    pgen.factorize(1236, pgen.primes.toIterator) should equal(Some(List(103, 3, 2, 2)))
-    pgen.factorize(1237, pgen.primes.toIterator) should equal(Some(Nil))
-    pgen.factorize(923412, pgen.primes.take(10).toIterator) should equal(None)
+    pgen.factorize(9, pgen.primes.iterator) should equal(Some(List(3, 3)))
+    pgen.factorize(1236, pgen.primes.iterator) should equal(Some(List(103, 3, 2, 2)))
+    pgen.factorize(1237, pgen.primes.iterator) should equal(Some(Nil))
+    pgen.factorize(923412, pgen.primes.take(10).iterator) should equal(None)
   }
 
 }

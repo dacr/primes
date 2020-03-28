@@ -28,7 +28,7 @@ class PrimesGenerator[NUM](implicit numops: Integral[NUM]) extends PrimesDefinit
       val isPrimeResult = isPrime(nextvalue)
       val nth = if (isPrimeResult) primeNth + one else notPrimeNth + one
       checkedValues(
-        CheckedValue[NUM](nextvalue, isPrimeResult, nextvalue.toString.size, nth),
+        CheckedValue[NUM](nextvalue, isPrimeResult, nextvalue.toString.length, nth),
         if (isPrimeResult) nth else primeNth,
         if (isPrimeResult) notPrimeNth else nth)
     }
@@ -59,11 +59,11 @@ class PrimesGenerator[NUM](implicit numops: Integral[NUM]) extends PrimesDefinit
 
   def primes:LazyList[NUM] =
     candidates
-      .filter(isPrime(_))
+      .filter(isPrime)
 
   def notPrimes:LazyList[NUM] =
     candidates
-      .filterNot(isPrime(_))
+      .filterNot(isPrime)
 
   // distances between consecutive primes
   def distances:LazyList[NUM] =
