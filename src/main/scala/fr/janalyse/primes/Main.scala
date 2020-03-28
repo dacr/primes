@@ -5,6 +5,7 @@
  */
 package fr.janalyse.primes
 
+import java.text.SimpleDateFormat
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
@@ -14,7 +15,7 @@ object Main {
   import pgen._
 
   // -------------------------------------------------------------
-  def ulamSpiralToPng(size: Int) {
+  def ulamSpiralToPng(size: Int):Unit = {
     import java.io.File
     import javax.imageio.ImageIO
 
@@ -35,7 +36,7 @@ object Main {
   */
 
 
-  def sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S Z")
+  def sdf: SimpleDateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S Z")
   def now: Long = System.currentTimeMillis
   
   
@@ -105,7 +106,7 @@ object Main {
     import pgen._
 
     @annotation.tailrec
-    def perfLoop(sz:Int,step:Int=25000, round:Int=1) {
+    def perfLoop(sz:Int,step:Int=25000, round:Int=1):Unit = {
       howLongFor(sz)(primes.drop(_).head)("lastPrime=" + _.toString)
       if (round < roundMax) perfLoop(sz+step, step=step, round=round+1)
     }

@@ -72,7 +72,7 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
     val testUpTo = sqrt(v)
     val segmentSize = (testUpTo - two) / coresCount
     @tailrec
-    def checkUpToPara(from: NUM, to: NUM) {
+    def checkUpToPara(from: NUM, to: NUM):Unit = {
       if (v % from == zero) result.complete(Success(false))
       else if (from < to && !result.isCompleted) checkUpToPara(from + one, to)
     }
@@ -93,7 +93,7 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
    */
   private class EratosthenesCell(val value: NUM) {
     private var marked = false
-    def mark() { marked = true }
+    def mark():Unit = { marked = true }
     def isMarked: Boolean = marked
     def isPrime: Boolean = !marked // true for primes only once the sieve of eratosthenes is finished
     override def toString = s"ECell($value, $marked)"
@@ -106,7 +106,7 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
   private final def buildSieve(it: NumericReverseIterator[NUM], cur: List[EratosthenesCell] = Nil): List[EratosthenesCell] =
     if (it.hasNext()) buildSieve(it, new EratosthenesCell(it.next()) :: cur) else cur
   @tailrec
-  private final def eratMark(limit: NUM, multiples: LazyList[NUM], cur: List[EratosthenesCell]) {
+  private final def eratMark(limit: NUM, multiples: LazyList[NUM], cur: List[EratosthenesCell]):Unit = {
     cur.headOption match {
       case None                        =>
       case _ if multiples.head > limit =>
@@ -118,7 +118,7 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
     }
   }
   @tailrec
-  private final def eratWorker(limit: NUM, upTo: NUM, cur: List[EratosthenesCell]) {
+  private final def eratWorker(limit: NUM, upTo: NUM, cur: List[EratosthenesCell]):Unit = {
     if (cur.nonEmpty && cur.head.value <= upTo) {
       if (!cur.head.isMarked) {
         eratMark(limit, new NumericIterator[NUM](two).to(LazyList).map(_ * cur.head.value), cur.tail)
@@ -191,7 +191,7 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
     gr.setColor(Color.WHITE)
 
     @tailrec
-    def spiral(x: Int, y: Int, sz: Int, remain: Int, len: Int) {
+    def spiral(x: Int, y: Int, sz: Int, remain: Int, len: Int):Unit = {
       draw(gr, x, y, len)
       for { i <- 1 to sz } draw(gr, x, y + i, len + 1) // DOWN
       for { i <- 1 to sz } draw(gr, x - i, y + sz, len + 2) // LEFT
@@ -207,14 +207,14 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
   }
 
   def ulamSpiral(size: Int, values: Iterator[CheckedValue[NUM]]): BufferedImage = {
-    def draw(gr: Graphics2D, x: Int, y: Int, len: Int) {
+    def draw(gr: Graphics2D, x: Int, y: Int, len: Int):Unit = {
       if (values.hasNext && values.next.isPrime) gr.drawRect(x, y, 0, 0)
     }
     spiral(size, draw)
   }
 
   def sacksInspiredSpiral(size: Int, interval: Int, values: Iterator[CheckedValue[NUM]]): BufferedImage = {
-    def draw(gr: Graphics2D, x: Int, y: Int, len: Int) {
+    def draw(gr: Graphics2D, x: Int, y: Int, len: Int):Unit = {
       if (values.hasNext && (len % interval == 0) && values.next.isPrime) gr.drawRect(x, y, 0, 0)
     }
     spiral(size, draw)
