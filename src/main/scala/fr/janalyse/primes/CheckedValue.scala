@@ -9,9 +9,9 @@ case class CheckedValue[NUM](
 object CheckedValue {
   def first[NUM](implicit numops: Integral[NUM]): CheckedValue[NUM] = {
     import numops._
-    CheckedValue(one + one, true, 1, one)
+    CheckedValue(value = one + one, isPrime = true, digitCount = 1, nth = one)
   }
   def apply[NUM](value: NUM, isPrime:Boolean, nth:NUM)(implicit numops: Integral[NUM]): CheckedValue[NUM] = {
-    CheckedValue(value, isPrime, value.toString.size, nth)
+    CheckedValue(value, isPrime, value.toString.length, nth)
   }
 }

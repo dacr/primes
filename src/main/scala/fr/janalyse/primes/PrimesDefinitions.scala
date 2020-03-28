@@ -34,7 +34,7 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
   }
 
   private final def sqrtNext(n: NUM, i: NUM): NUM = (n + i / n) / two
-  final def sqrt(number: NUM) = { //https://issues.scala-lang.org/browse/SI-3739
+  final def sqrt(number: NUM): NUM = { //https://issues.scala-lang.org/browse/SI-3739
     var n = one
     var n1 = sqrtNext(n, number)
 
@@ -89,9 +89,9 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
   private class EratosthenesCell(val value: NUM) {
     private var marked = false
     def mark() { marked = true }
-    def isMarked = marked
-    def isPrime() = marked == false // true for primes only once the sieve of eratosthenes is finished
-    override def toString() = s"ECell($value, $marked)"
+    def isMarked: Boolean = marked
+    def isPrime: Boolean = !marked // true for primes only once the sieve of eratosthenes is finished
+    override def toString = s"ECell($value, $marked)"
   }
 
   /**
@@ -99,7 +99,7 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
    */
   @tailrec
   private final def buildSieve(it: NumericReverseIterator[NUM], cur: List[EratosthenesCell] = Nil): List[EratosthenesCell] =
-    if (it.hasNext) buildSieve(it, new EratosthenesCell(it.next) :: cur) else cur
+    if (it.hasNext()) buildSieve(it, new EratosthenesCell(it.next()) :: cur) else cur
   @tailrec
   private final def eratMark(limit: NUM, multiples: LazyList[NUM], cur: List[EratosthenesCell]) {
     cur.headOption match {
@@ -108,13 +108,13 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
       case Some(cell) if cell.value == multiples.head =>
         cell.mark()
         eratMark(limit, multiples.tail, cur.tail)
-      case Some(cell) =>
+      case Some(_) =>
         eratMark(limit, multiples, cur.tail)
     }
   }
   @tailrec
   private final def eratWorker(limit: NUM, upTo: NUM, cur: List[EratosthenesCell]) {
-    if (!cur.isEmpty && cur.head.value <= upTo) {
+    if (cur.nonEmpty && cur.head.value <= upTo) {
       if (!cur.head.isMarked) {
         eratMark(limit, new NumericIterator[NUM](two).to(LazyList).map(_ * cur.head.value), cur.tail)
       }
@@ -130,7 +130,7 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
     def computeNth(isp: Boolean): NUM = {
       if (isp) { nthIsPrime += one; nthIsPrime } else { nthIsNotPrime += one; nthIsNotPrime }
     }
-    sieve.map(ec => CheckedValue(ec.value, ec.isPrime(), computeNth(ec.isPrime())))
+    sieve.map(ec => CheckedValue(ec.value, ec.isPrime, computeNth(ec.isPrime)))
   }
 
   /**
