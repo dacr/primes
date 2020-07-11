@@ -68,7 +68,7 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
   val coresCount: NUM = fromInt(java.lang.Runtime.getRuntime.availableProcessors)
   
   final def isPrimePara(v: NUM)(implicit ec: ExecutionContext): Boolean = {
-    val result = Promise[Boolean]
+    val result = Promise[Boolean]()
     val testUpTo = sqrt(v)
     val segmentSize = (testUpTo - two) / coresCount
     @tailrec
@@ -104,7 +104,7 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
    */
   @tailrec
   private final def buildSieve(it: NumericReverseIterator[NUM], cur: List[EratosthenesCell] = Nil): List[EratosthenesCell] =
-    if (it.hasNext()) buildSieve(it, new EratosthenesCell(it.next()) :: cur) else cur
+    if (it.hasNext) buildSieve(it, new EratosthenesCell(it.next()) :: cur) else cur
   @tailrec
   private final def eratMark(limit: NUM, multiples: LazyList[NUM], cur: List[EratosthenesCell]):Unit = {
     cur.headOption match {
@@ -169,9 +169,9 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
       if (!primes2test.hasNext) None
       else if (current <= one || prime == value) Some(acc)
       else if (current % prime == zero) factit(current / prime, prime, prime :: acc)
-      else factit(current, primes2test.next, acc)
+      else factit(current, primes2test.next(), acc)
     }
-    val prime4start = primes2test.next
+    val prime4start = primes2test.next()
     factit(value, prime4start, Nil)
   }
 
@@ -208,14 +208,14 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
 
   def ulamSpiral(size: Int, values: Iterator[CheckedValue[NUM]]): BufferedImage = {
     def draw(gr: Graphics2D, x: Int, y: Int, len: Int):Unit = {
-      if (values.hasNext && values.next.isPrime) gr.drawRect(x, y, 0, 0)
+      if (values.hasNext && values.next().isPrime) gr.drawRect(x, y, 0, 0)
     }
     spiral(size, draw)
   }
 
   def sacksInspiredSpiral(size: Int, interval: Int, values: Iterator[CheckedValue[NUM]]): BufferedImage = {
     def draw(gr: Graphics2D, x: Int, y: Int, len: Int):Unit = {
-      if (values.hasNext && (len % interval == 0) && values.next.isPrime) gr.drawRect(x, y, 0, 0)
+      if (values.hasNext && (len % interval == 0) && values.next().isPrime) gr.drawRect(x, y, 0, 0)
     }
     spiral(size, draw)
   }

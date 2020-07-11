@@ -12,5 +12,5 @@ class NumericIterator[NUM](startFrom:NUM)(implicit numops: Integral[NUM]) extend
     num += one
     num
   }
-  override def hasNext(): Boolean = true
+  override def hasNext: Boolean = true
 }

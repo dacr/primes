@@ -12,5 +12,5 @@ class NumericReverseIterator[NUM](startWith:NUM, endTest:NUM=>Boolean)(implicit 
     num -= one
     num
   }
-  override def hasNext(): Boolean = endTest(num)
+  override def hasNext: Boolean = endTest(num)
 }
