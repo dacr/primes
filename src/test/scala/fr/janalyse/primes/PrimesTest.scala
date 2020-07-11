@@ -11,8 +11,8 @@ class PrimesTest extends PrimesTestCommons {
   test("Simple tests") {
     val pgen = new PrimesGenerator[Long]
     import pgen._
-    primes.take(3) should equal(List(2, 3, 5))
-    primes.drop(3).head should equal(7)
+    primes.take(3) should contain theSameElementsInOrderAs List(2, 3, 5)
+    primes.drop(3).take(3) should contain theSameElementsInOrderAs List(7, 11, 13)
     primes.drop(999).head should equal(7919)
   }
 
