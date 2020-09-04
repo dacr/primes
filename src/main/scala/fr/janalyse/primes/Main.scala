@@ -107,7 +107,7 @@ object Main {
 
     @annotation.tailrec
     def perfLoop(sz:Int,step:Int=25000, round:Int=1):Unit = {
-      howLongFor(sz)(primes.drop(_).head)("lastPrime=" + _.toString)
+      howLongFor(sz)(primes.drop(_).next())("lastPrime=" + _.toString)
       if (round < roundMax) perfLoop(sz+step, step=step, round=round+1)
     }
     perfLoop(50000)

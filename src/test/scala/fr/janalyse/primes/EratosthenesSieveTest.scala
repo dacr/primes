@@ -25,7 +25,7 @@ class EratosthenesSieveTest extends PrimesTestCommons {
     
     val found = dp.eratosthenesSieve(howmany)
     
-    found should equal(gp.checkedValues.takeWhile { _.value <= howmany })
+    found should equal(gp.checkedValues.takeWhile { _.value <= howmany }.toList)
   }
 
 //  test("EratosthenesSieve performance test") {

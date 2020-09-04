@@ -12,88 +12,107 @@ class PrimesGenerator[NUM](implicit numops: Integral[NUM]) extends PrimesDefinit
   import annotation.tailrec
   import numops._
 
-  // ------------------------ STREAMS ------------------------
-
-  def integers: LazyList[NUM] = {
-    def next(cur: NUM): LazyList[NUM] = cur #:: next(cur + one)
-    next(one)
-  }
+  def integers: Iterator[NUM] = new NumericIterator[NUM](one)
 
   protected def checkedValues(
-    cur: CheckedValue[NUM],
-    primeNth: NUM,
-    notPrimeNth: NUM): LazyList[CheckedValue[NUM]] =
-    cur #:: {
-      val nextvalue = cur.value + one
-      val isPrimeResult = isPrime(nextvalue)
-      val nth = if (isPrimeResult) primeNth + one else notPrimeNth + one
-      checkedValues(
-        CheckedValue[NUM](nextvalue, isPrimeResult, nextvalue.toString.length, nth),
-        if (isPrimeResult) nth else primeNth,
-        if (isPrimeResult) notPrimeNth else nth)
+    initialCheckedValue: CheckedValue[NUM],
+    initialPrimeNth: NUM,
+    initialNotPrimeNth: NUM): Iterator[CheckedValue[NUM]] = {
+    new Iterator[CheckedValue[NUM]] {
+      var current: CheckedValue[NUM] = initialCheckedValue
+      var primeNth: NUM = initialPrimeNth
+      var notPrimeNth: NUM = initialNotPrimeNth
+
+      override def hasNext: Boolean = true // TODO
+
+      override def next(): CheckedValue[NUM] = {
+        val previous = current
+        val nextValue = current.value + one
+        val isPrimeResult = isPrime(nextValue)
+        val nth = if (isPrimeResult) {
+          primeNth += one
+          primeNth
+        } else {
+          notPrimeNth += one
+          notPrimeNth
+        }
+        current = CheckedValue[NUM](
+          nextValue,
+          isPrimeResult,
+          nextValue.toString.length,
+          nth
+        )
+        previous
+      }
     }
+  }
+
 
   def checkedValues(
-      foundLastPrime: Option[CheckedValue[NUM]],
-      foundLastNotPrime:Option[CheckedValue[NUM]]): LazyList[CheckedValue[NUM]] = {
-      val foundLast = for {
-        flp <- foundLastPrime
-        flnp <- foundLastNotPrime
-      } yield if (flp.value > flnp.value) flp else flnp
+    foundLastPrime: Option[CheckedValue[NUM]],
+    foundLastNotPrime: Option[CheckedValue[NUM]]): Iterator[CheckedValue[NUM]] = {
+    val foundLast = for {
+      flp <- foundLastPrime
+      flnp <- foundLastNotPrime
+    } yield if (flp.value > flnp.value) flp else flnp
 
-      val primeNth = foundLastPrime.map(_.nth).getOrElse(one)
-      val notPrimeNth = foundLastNotPrime.map(_.nth).getOrElse(zero)
-      val resuming = foundLast.isDefined
-      
-      // And now return the resumed (or not) stream 
-      checkedValues(foundLast.getOrElse(CheckedValue.first), primeNth, notPrimeNth) match {
-        case s if resuming => s.tail
-        case s => s
-      }
+    val primeNth = foundLastPrime.map(_.nth).getOrElse(one)
+    val notPrimeNth = foundLastNotPrime.map(_.nth).getOrElse(zero)
+    val resuming = foundLast.isDefined
+
+    // And now return the resumed (or not) stream
+    checkedValues(foundLast.getOrElse(CheckedValue.first), primeNth, notPrimeNth) match {
+      case s if resuming => s.next(); s
+      case s => s
+    }
   }
-  
-  def checkedValues: LazyList[CheckedValue[NUM]] =
+
+  def checkedValues: Iterator[CheckedValue[NUM]] =
     checkedValues(CheckedValue.first[NUM], one, zero)
 
-  def candidates:LazyList[NUM] = integers.tail
+  def candidates: Iterator[NUM] = {
+    val it = integers
+    it.next()
+    it
+  }
 
-  def primes:LazyList[NUM] =
+  def primes: Iterator[NUM] =
     candidates
       .filter(isPrime)
 
-  def notPrimes:LazyList[NUM] =
+  def notPrimes: Iterator[NUM] =
     candidates
       .filterNot(isPrime)
 
   // distances between consecutive primes
-  def distances:LazyList[NUM] =
+  def distances: Iterator[NUM] =
     primes
       .sliding(2, 1)
       .map(slice => slice.tail.head - slice.head)
-      .to(LazyList)
+      .to(Iterator)
 
-//  def primesPar =
-//    candidates
-//      .iterator //  workaround for Memory impact of the .par on just stream is too huge...
-//      .grouped(1000)
-//      .map(_.par)
-//      .flatMap(_.filter(isPrime(_)))
-//      .toLazyList
+  //  def primesPar =
+  //    candidates
+  //      .iterator //  workaround for Memory impact of the .par on just stream is too huge...
+  //      .grouped(1000)
+  //      .map(_.par)
+  //      .flatMap(_.filter(isPrime(_)))
+  //      .toIterator
 
-  def mersennePrimes:LazyList[NUM] =
+  def mersennePrimes: Iterator[NUM] =
     candidates
       .filter(isMersennePrimeExponent(_))
       .map(pow(two, _) - one)
 
-  def sexyPrimes:LazyList[NUM] =
+  def sexyPrimes: Iterator[NUM] =
     candidates
       .filter(isSexyPrime(_))
 
-  def twinPrimes:LazyList[NUM] =
+  def twinPrimes: Iterator[NUM] =
     candidates
       .filter(isTwinPrime(_))
 
-  def isolatedPrimes:LazyList[NUM] =
+  def isolatedPrimes: Iterator[NUM] =
     candidates
       .filter(isIsolatedPrime(_))
 
