@@ -88,4 +88,4 @@ and so one...
 [mavenLink]: https://search.maven.org/#search%7Cga%7C1%7Cfr.janalyse.primes
 
 [licenseImg]: https://img.shields.io/github/license/dacr/primes.svg
-[licenseLink]: LICENSE
+[licenseLink]: https://www.apache.org/licenses/LICENSE-2.0.txt
