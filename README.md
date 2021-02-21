@@ -20,7 +20,7 @@ ngen: fr.janalyse.primes.PrimesGenerator[Long] = fr.janalyse.primes.PrimesGenera
 scala> import ngen._
 import ngen._
 
-scala> primes(500)
+scala> primes.to(LazyList)(500)
 res0: Long = 3581
 
 scala> primes.take(15).toList
@@ -35,10 +35,10 @@ res3: List[Long] = List(23, 37, 47, 53, 67, 79, 83, 89, 97, 113)
 scala> checkedValues.filter(_.isPrime).find(_.nth==100000)
 res4: Option[fr.janalyse.primes.CheckedValue[Long]] = Some(CheckedValue(1299709,true,100000))
 
-scala> checkedValues.filter(_.isPrime)(0)
+scala> checkedValues.filter(_.isPrime).to(LazyList)(0)
 res5: fr.janalyse.primes.CheckedValue[Long] = CheckedValue(2,true,1)
 
-scala> checkedValues.filter(_.isPrime)(99)
+scala> checkedValues.filter(_.isPrime).to(LazyList)(99)
 res6: fr.janalyse.primes.CheckedValue[Long] = CheckedValue(541,true,100)
 
 scala> checkedValues.filter(!_.isPrime).drop(1000).take(10).mkString("\n")
@@ -75,6 +75,9 @@ scala> val dp = new PrimesDefinitions[BigInt]()
 scala> dp.eratosthenesSieve(100).last
 res0: fr.janalyse.primes.CheckedValue[BigInt] = CheckedValue(100,false,3,74)
 
+scala> ulamSpiralToPngFile(500, checkedValues, "ulam-spiral.png")
+
+scala> sacksInspiredSpiralToPngFile(500, 3, checkedValues, "ulam-sacks-like.png")
 
   
 ```

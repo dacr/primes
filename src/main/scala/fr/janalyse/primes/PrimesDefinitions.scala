@@ -20,6 +20,8 @@ import java.awt.image.BufferedImage
 import java.awt.Color
 import annotation.tailrec
 import java.awt.Graphics2D
+import java.io.File
+import javax.imageio.ImageIO
 import scala.concurrent._
 import scala.concurrent.duration._
 import scala.util._
@@ -223,11 +225,21 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
     spiral(size, draw)
   }
 
+  def ulamSpiralToPngFile(size:Int, values: Iterator[CheckedValue[NUM]], filename:String) = {
+    ImageIO.write(ulamSpiral(size, values), "PNG", new File(filename))
+
+  }
+
   def sacksInspiredSpiral(size: Int, interval: Int, values: Iterator[CheckedValue[NUM]]): BufferedImage = {
     def draw(gr: Graphics2D, x: Int, y: Int, len: Int):Unit = {
       if (values.hasNext && (len % interval == 0) && values.next().isPrime) gr.drawRect(x, y, 0, 0)
     }
     spiral(size, draw)
+  }
+
+  def sacksInspiredSpiralToPngFile(size:Int, interval:Int, values: Iterator[CheckedValue[NUM]], filename:String) = {
+    ImageIO.write(sacksInspiredSpiral(size, interval, values), "PNG", new File(filename))
+
   }
 
 }

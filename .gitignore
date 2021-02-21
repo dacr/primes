@@ -10,5 +10,6 @@ target/
 .settings
 nohup.out
 /bin/
-.idea
-.DS_store
+.idea/
+.bsp/
+.DS_store/

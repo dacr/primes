@@ -18,6 +18,7 @@ package fr.janalyse.primes
 import java.text.SimpleDateFormat
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
+import scala.util.Try
 
 object Main {
 
@@ -25,27 +26,18 @@ object Main {
   import pgen._
 
   // -------------------------------------------------------------
-  def ulamSpiralToPng(size: Int):Unit = {
-    import java.io.File
-    import javax.imageio.ImageIO
 
-    ImageIO.write(ulamSpiral(size, checkedValues.iterator), "PNG", new File(s"ulam-spiral-$size.png"))
-    ImageIO.write(sacksInspiredSpiral(size, 3, checkedValues.iterator), "PNG", new File(s"ulam-sacks-like-$size.png"))
-  }
-
-  // -------------------------------------------------------------
-  /*
   def main(args: Array[String]): Unit = {
     // With PrimesGenerator[Long]
     // 1000 - 8s
     // 2000 - 27s
     // 3000 - 1m16s
     val size = Try { args(0).toInt }.getOrElse(1000)
-    ulamSpiralToPng(size)
+    ulamSpiralToPngFile(size, checkedValues, s"ulam-spiral-$size.png")
+    //sacksInspiredSpiralToPngFile(size, 3, checkedValues, "ulam-sacks-like-$size.png")
   }
-  */
 
-
+/*
   def sdf: SimpleDateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S Z")
   def now: Long = System.currentTimeMillis
   
@@ -122,4 +114,5 @@ object Main {
     }
     perfLoop(50000)
   }
+ */
 }
