@@ -4,12 +4,12 @@ homepage := Some(new URL("https://github.com/dacr/primes"))
 licenses += "Apache 2" -> url(s"http://www.apache.org/licenses/LICENSE-2.0.txt")
 scmInfo := Some(ScmInfo(url(s"https://github.com/dacr/primes"), s"git@github.com:dacr/primes.git"))
 
-scalaVersion := "2.13.4"
+scalaVersion := "2.13.5"
 scalacOptions ++= Seq( "-deprecation", "-unchecked", "-feature")
 
-crossScalaVersions := Seq("2.13.4")
+crossScalaVersions := Seq("2.13.5")
 
-libraryDependencies += "org.scalatest" %% "scalatest"   % "3.2.3" % "test"
+libraryDependencies += "org.scalatest" %% "scalatest"   % "3.2.5" % "test"
 
 testOptions in Test += {
   val rel = scalaVersion.value.split("[.]").take(2).mkString(".")
