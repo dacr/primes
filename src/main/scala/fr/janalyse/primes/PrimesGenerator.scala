@@ -23,6 +23,7 @@ class PrimesGenerator[NUM](implicit numops: Integral[NUM]) extends PrimesDefinit
   import numops._
 
   def integers: Iterator[NUM] = new NumericIterator[NUM](one)
+  def integersFrom(thatValue:NUM): Iterator[NUM] = new NumericIterator[NUM](thatValue)
 
   protected def checkedValues(
     initialCheckedValue: CheckedValue[NUM],
@@ -86,13 +87,28 @@ class PrimesGenerator[NUM](implicit numops: Integral[NUM]) extends PrimesDefinit
     it
   }
 
+  def candidatesAfter(thatValue:NUM):Iterator[NUM] = {
+    val it = integersFrom(thatValue)
+    it.next()
+    it
+  }
+
   def primes: Iterator[NUM] =
     candidates
+      .filter(isPrime)
+
+  def primesAfter(thatValue:NUM): Iterator[NUM] =
+    candidatesAfter(thatValue)
       .filter(isPrime)
 
   def notPrimes: Iterator[NUM] =
     candidates
       .filterNot(isPrime)
+
+  def notPrimesAfter(thatValue:NUM): Iterator[NUM] =
+    candidatesAfter(thatValue)
+      .filterNot(isPrime)
+
 
   // distances between consecutive primes
   def distances: Iterator[NUM] =

@@ -18,6 +18,18 @@ package fr.janalyse.primes
 
 class PrimesTest extends PrimesTestCommons {
 
+  test("Integers iterator") {
+    val pgen = new PrimesGenerator[Int]
+    pgen.integers.take(5).toList should contain theSameElementsInOrderAs List(1,2,3,4,5)
+    pgen.integersFrom(3).take(5).toList should contain theSameElementsInOrderAs List(3,4,5,6,7)
+  }
+
+  test("Candidates iterator") {
+    val pgen = new PrimesGenerator[Int]
+    pgen.candidates.take(5).toList should contain theSameElementsInOrderAs List(2,3,4,5,6)
+    pgen.candidatesAfter(3).take(5).toList should contain theSameElementsInOrderAs List(4,5,6,7,8)
+  }
+
   test("Simple tests with Int type") {
     val pgen = new PrimesGenerator[Int]
     import pgen._
@@ -40,6 +52,12 @@ class PrimesTest extends PrimesTestCommons {
     primes.take(3).toList should contain theSameElementsInOrderAs List(2, 3, 5)
     primes.slice(3, 6).toList should contain theSameElementsInOrderAs List(7, 11, 13)
     primes.drop(999).to(LazyList).head should equal(7919)
+  }
+
+  test("primes from a given start value") {
+    val pgen = new PrimesGenerator[Long]
+    import pgen._
+    primesAfter(13).take(3).toList should contain theSameElementsInOrderAs List(17, 19, 23)
   }
 
   test("checked values tests") {
