@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 David Crosson
+ * Copyright 2013-2022 David Crosson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,20 +21,20 @@ import org.scalatest.OptionValues._
 class EratosthenesSieveTest extends PrimesTestCommons {
 
   test("basic tests") {
-    val dp = new PrimesDefinitions[Int]()
+    val dp    = new PrimesDefinitions[Int]()
     val found = dp.eratosthenesSieve(10)
-    found.find(_.value == 9).value.isPrime should be (false)
-    found.find(_.value == 7).value.isPrime should be (true)
+    found.find(_.value == 9).value.isPrime should be(false)
+    found.find(_.value == 7).value.isPrime should be(true)
   }
 
   test("correctness test") {
     val howmany = 1000
-    
+
     val dp = new PrimesDefinitions[Int]()
     val gp = new PrimesGenerator[Int]()
-    
+
     val found = dp.eratosthenesSieve(howmany)
-    
+
     found should equal(gp.checkedValues.takeWhile { _.value <= howmany }.toList)
   }
 

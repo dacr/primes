@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 David Crosson
+ * Copyright 2013-2022 David Crosson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,14 +20,14 @@ class PrimesTest extends PrimesTestCommons {
 
   test("Integers iterator") {
     val pgen = new PrimesGenerator[Int]
-    pgen.integers.take(5).toList should contain theSameElementsInOrderAs List(1,2,3,4,5)
-    pgen.integersFrom(3).take(5).toList should contain theSameElementsInOrderAs List(3,4,5,6,7)
+    pgen.integers.take(5).toList should contain theSameElementsInOrderAs List(1, 2, 3, 4, 5)
+    pgen.integersFrom(3).take(5).toList should contain theSameElementsInOrderAs List(3, 4, 5, 6, 7)
   }
 
   test("Candidates iterator") {
     val pgen = new PrimesGenerator[Int]
-    pgen.candidates.take(5).toList should contain theSameElementsInOrderAs List(2,3,4,5,6)
-    pgen.candidatesAfter(3).take(5).toList should contain theSameElementsInOrderAs List(4,5,6,7,8)
+    pgen.candidates.take(5).toList should contain theSameElementsInOrderAs List(2, 3, 4, 5, 6)
+    pgen.candidatesAfter(3).take(5).toList should contain theSameElementsInOrderAs List(4, 5, 6, 7, 8)
   }
 
   test("Simple tests with Int type") {
@@ -61,7 +61,7 @@ class PrimesTest extends PrimesTestCommons {
   }
 
   test("checked values tests") {
-    val pgen = new PrimesGenerator[Long]
+    val pgen   = new PrimesGenerator[Long]
     import pgen._
     val values = checkedValues.take(1000).toList
 
@@ -71,7 +71,7 @@ class PrimesTest extends PrimesTestCommons {
     values.filter(_.isPrime).take(5).map(_.value) should equal(List(2, 3, 5, 7, 11))
     values.filterNot(_.isPrime).take(5).map(_.value) should equal(List(4, 6, 8, 9, 10))
 
-    val prime100 = values.filter(_.isPrime).drop(99)
+    val prime100    = values.filter(_.isPrime).drop(99)
     val notPrime100 = values.filter(!_.isPrime).drop(99)
     prime100.head.value should equal(541)
     notPrime100.head.value should equal(133)
@@ -81,8 +81,8 @@ class PrimesTest extends PrimesTestCommons {
   test("Resume checked value tests") {
     val pgen = new PrimesGenerator[Long]
 
-    val starts = pgen.checkedValues.takeWhile(_.value <= 10).toList
-    val lastPrime = starts.filter(_.isPrime).lastOption
+    val starts       = pgen.checkedValues.takeWhile(_.value <= 10).toList
+    val lastPrime    = starts.filter(_.isPrime).lastOption
     val lastNotPrime = starts.filterNot(_.isPrime).lastOption
 
     val resumed = pgen.checkedValues(lastPrime, lastNotPrime).takeWhile(_.value <= 20).toList

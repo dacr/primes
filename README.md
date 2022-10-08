@@ -1,4 +1,4 @@
-# primes [![Build Status][travisImg]][travisLink] [![License][licenseImg]][licenseLink] [![Maven][mavenImg]][mavenLink]
+# primes [![License][licenseImg]][licenseLink] [![Maven][mavenImg]][mavenLink]
 
 Playing with primes using scala language. Draw Ulam spiral, ...
 
@@ -83,9 +83,6 @@ scala> sacksInspiredSpiralToPngFile(500, 3, checkedValues, "ulam-sacks-like.png"
 ```
 
 and so one...
-
-[travisImg]: https://img.shields.io/travis/dacr/primes.svg
-[travisLink]:https://travis-ci.org/dacr/primes
 
 [mavenImg]: https://img.shields.io/maven-central/v/fr.janalyse/primes_2.13.svg
 [mavenLink]: https://search.maven.org/#search%7Cga%7C1%7Cfr.janalyse.primes

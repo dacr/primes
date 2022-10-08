@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 David Crosson
+ * Copyright 2013-2022 David Crosson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,22 +34,22 @@ object Main {
     // 3000 - 1m16s
     val size = Try { args(0).toInt }.getOrElse(1000)
     ulamSpiralToPngFile(size, checkedValues, s"ulam-spiral-$size.png")
-    //sacksInspiredSpiralToPngFile(size, 3, checkedValues, "ulam-sacks-like-$size.png")
+    // sacksInspiredSpiralToPngFile(size, 3, checkedValues, "ulam-sacks-like-$size.png")
   }
 
-/*
+  /*
   def sdf: SimpleDateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S Z")
   def now: Long = System.currentTimeMillis
-  
-  
+
+
   case class RunningContext(props:Map[String,String])
   object RunningContext{
     import scala.util.Try
-    
+
     def hostname: Option[(String,String)] = {
       Try(java.net.InetAddress.getLocalHost.getHostName).map("hostname"-> _).toOption
     }
-    
+
     def apply():RunningContext = {
       RunningContext(
         Map(
@@ -64,7 +64,7 @@ object Main {
       )
     }
   }
-  
+
   def genjson(props:Map[String,Any]):String = {
     val results:Map[String,String] = for { (key, value) <- props} yield {
       value match {
@@ -74,10 +74,10 @@ object Main {
         case x:Float=> (key, x.toString)
         case x => (key, "\""+x.toString+"\"")
       }
-    } 
+    }
     results.map{case (k,v) => s""""$k":$v"""}.mkString("{", ", ", "}")
   }
-  
+
   def howLongFor[U, T](param: U)(proc: U => T)(infoOnResult: T => String)(implicit context:RunningContext): T = {
     now match {
       case start =>
@@ -114,5 +114,5 @@ object Main {
     }
     perfLoop(50000)
   }
- */
+   */
 }

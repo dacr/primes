@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 David Crosson
+ * Copyright 2013-2022 David Crosson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,16 @@ case class CheckedValue[NUM](
   value: NUM,
   isPrime: Boolean,
   digitCount: Long,
-  nth: NUM)(implicit numops: Integral[NUM])
+  nth: NUM
+)(implicit numops: Integral[NUM])
 
 object CheckedValue {
   def first[NUM](implicit numops: Integral[NUM]): CheckedValue[NUM] = {
     import numops._
     CheckedValue(value = one + one, isPrime = true, digitCount = 1, nth = one)
   }
-  def apply[NUM](value: NUM, isPrime:Boolean, nth:NUM)(implicit numops: Integral[NUM]): CheckedValue[NUM] = {
+
+  def apply[NUM](value: NUM, isPrime: Boolean, nth: NUM)(implicit numops: Integral[NUM]): CheckedValue[NUM] = {
     CheckedValue(value, isPrime, value.toString.length, nth)
   }
 }

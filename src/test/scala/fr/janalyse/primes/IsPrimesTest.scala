@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 David Crosson
+ * Copyright 2013-2022 David Crosson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package fr.janalyse.primes
 class IsPrimesTest extends PrimesTestCommons {
 
   test("isPrimePara tests") {
-    val gen = new PrimesGenerator[Int]
+    val gen   = new PrimesGenerator[Int]
     import gen._
     import scala.concurrent.ExecutionContext.Implicits.global
     val monos = integers.filter(isPrime).take(100).toList

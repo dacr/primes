@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 David Crosson
+ * Copyright 2013-2022 David Crosson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,15 @@
  */
 package fr.janalyse.primes
 
-class NumericReverseIterator[NUM](startWith:NUM, endTest:NUM=>Boolean)(implicit numops: Integral[NUM]) extends Iterator[NUM] {
+class NumericReverseIterator[NUM](startWith: NUM, endTest: NUM => Boolean)(implicit numops: Integral[NUM]) extends Iterator[NUM] {
   import numops._
+
   private var num: NUM = startWith + one
+
   override def next(): NUM = {
     num -= one
     num
   }
+
   override def hasNext: Boolean = endTest(num)
 }
