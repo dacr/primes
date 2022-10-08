@@ -86,7 +86,7 @@ and so one...
 
 [tests-workflow]: https://github.com/dacr/primes/actions/workflows/scala.yml/badge.svg
 
-[mavenImg]: https://img.shields.io/maven-central/v/fr.janalyse/primes_2.13.svg
+[mavenImg]: https://img.shields.io/maven-central/v/fr.janalyse/primes_3.svg
 [mavenLink]: https://search.maven.org/#search%7Cga%7C1%7Cfr.janalyse.primes
 
 [licenseImg]: https://img.shields.io/github/license/dacr/primes.svg
