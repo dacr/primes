@@ -4,10 +4,10 @@ description  := "Library to play with primes using scala language. Draw Ulam spi
 
 licenses += "NON-AI-APACHE2" -> url(s"https://github.com/non-ai-licenses/non-ai-licenses/blob/main/NON-AI-APACHE2")
 
-scalaVersion := "3.5.1"
-scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature")
+scalaVersion := "3.3.4"
+crossScalaVersions := Seq("2.13.16", "3.3.4")
 
-crossScalaVersions := Seq("2.13.15", "3.5.1")
+scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature")
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.19" % Test
 
