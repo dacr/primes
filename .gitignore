@@ -3,10 +3,13 @@
 *.log
 nohup.out
 .attach_pid*
+.DS_Store
 
 # build related
 target/
+project/target
 metals.sbt
+.direnv
 
 # IDE related
 .metals/
@@ -14,10 +17,14 @@ metals.sbt
 .bsp/
 .vscode/
 .idea/
+.scala-build/
 .classpath
 .project/
 .cache/
 .settings/
+.opencode/
+.antigravitycli/
+*.iml
 
 # Security purposes
 .envrc
