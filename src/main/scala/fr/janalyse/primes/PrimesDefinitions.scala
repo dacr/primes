@@ -211,10 +211,10 @@ class PrimesDefinitions[NUM](implicit numops: Integral[NUM]) {
     @tailrec
     def spiral(x: Int, y: Int, sz: Int, remain: Int, len: Int): Unit = {
       draw(gr, x, y, len)
-      for { i <- 1 to sz } draw(gr, x, y + i, len + 1)               // DOWN
-      for { i <- 1 to sz } draw(gr, x - i, y + sz, len + 2)          // LEFT
+      for { i <- 1 to sz } draw(gr, x, y + i, len + 1) // DOWN
+      for { i <- 1 to sz } draw(gr, x - i, y + sz, len + 2) // LEFT
       for { i <- 1 to sz + 1 } draw(gr, x - sz, y + sz - i, len + 3) // UP
-      for { i <- 1 to sz } draw(gr, x - sz + i, y - 1, len + 4)      // RIGHT
+      for { i <- 1 to sz } draw(gr, x - sz + i, y - 1, len + 4) // RIGHT
       if (remain > 0) spiral(x + 1, y - 1, sz + 2, remain - 2 * sz - 2 * (sz - 1), len + 5)
     }
 
